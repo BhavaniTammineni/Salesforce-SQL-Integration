@@ -1,0 +1,328 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd 
+http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+    
+    
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="58c17e5c-7e7f-4ef8-910d-c3e7bd2840e6" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="salesforce-ryzen-system-api-main" doc:id="6c984bac-415d-46e8-ae51-8e597cde1804">
+        <http:listener config-ref="HTTP_Listener_config" path="${app.name}/api/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body><![CDATA[#[payload]]]></http:body>
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:error-response>
+        </http:listener>
+		<apikit:router config-ref="salesforce-ryzen-system-api-config" />
+        <error-handler ref="global-error-handlerError_Handler"/>
+            <!-- <on-error-propagate type="APIKIT:BAD_REQUEST">
+                <ee:transform>
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+-&#45;&#45;
+{message: "Bad request"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">400</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform>
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+-&#45;&#45;
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:METHOD_NOT_ALLOWED">
+                <ee:transform>
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+-&#45;&#45;
+{message: "Method not allowed"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">405</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_ACCEPTABLE">
+                <ee:transform>
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+-&#45;&#45;
+{message: "Not acceptable"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">406</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:UNSUPPORTED_MEDIA_TYPE">
+                <ee:transform>
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+-&#45;&#45;
+{message: "Unsupported media type"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">415</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_IMPLEMENTED">
+                <ee:transform>
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+-&#45;&#45;
+{message: "Not Implemented"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">501</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler> -->
+    </flow>
+    <flow name="salesforce-ryzen-system-api-console">
+        <http:listener config-ref="HTTP_Listener_config" path="${app.name}/console/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body><![CDATA[#[payload]]]></http:body>
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:console config-ref="salesforce-ryzen-system-api-config" />
+        <error-handler ref="global-error-handlerError_Handler"/>
+            <!-- <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform>
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+-&#45;&#45;
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler> -->
+    </flow>
+    <flow name="post:\create:salesforce-ryzen-system-api-config">
+        <set-variable value="#[attributes.queryParams.forceNull default false]" doc:name="Set fieldsToNull" doc:id="5192267f-69fa-456a-aefc-257739e998db" variableName="fieldsToNull" />
+        <choice doc:name="Choice" doc:id="09171dc9-e1e3-4f05-8d90-c26f0b694b87">
+			<when expression="#[vars.fieldsToNull]">
+				<ee:transform doc:name="Transform Message" doc:id="ec098cc3-ebef-4855-a5c1-ffbd99714501">
+					<ee:message>
+						<ee:set-payload resource="dw-config/transform-forcenull.dwl" />
+					</ee:message>
+				</ee:transform>
+			</when>
+		</choice>
+		<try doc:name="Try" doc:id="b35246f0-b35d-4cfb-ad15-cc3f69ecca1a" transactionalAction="BEGIN_OR_JOIN" transactionType="XA">
+			<salesforce:create type="#[attributes.queryParams.SF_Type]" doc:name="Create" doc:id="c816f0e4-4f7f-43d7-a0a3-55aa11984227" config-ref="Salesforce_Config" />
+			<error-handler >
+				<on-error-propagate enableNotifications="false" logException="false" doc:name="On Error Propagate" doc:id="b9a72a31-6f60-4b72-ac3e-f6ac9c10ba5f" type="ANY"/>
+			</error-handler>
+		</try>
+		<ee:transform>
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+	<flow name="put:\update:salesforce-ryzen-system-api-config">
+		<set-variable value="#[attributes.queryParams.forceNull default false]" doc:name="Set fieldsToNull" doc:id="2d1ca959-4ac5-4fbf-91a9-e69a2b02d9f5" variableName="fieldsToNull"/>
+		<choice doc:name="Choice" doc:id="cb3cebfb-7e55-4454-b65e-a91402a97943" >
+			<when expression="#[vars.fieldsToNull]">
+				<ee:transform doc:name="Transform Message" doc:id="69f0f2a6-1848-4bc4-ab7a-35a77486662d" >
+					<ee:message >
+						<ee:set-payload resource="dw-config/transform-forcenull.dwl" />
+					</ee:message>
+				</ee:transform>
+			</when>
+		</choice>
+		<salesforce:update type="#[attributes.queryParams.SF_Type]" doc:name="Update" doc:id="359d83ce-9613-4685-8eb3-2a42a6f12275" config-ref="Salesforce_Config"/>
+		<ee:transform doc:name="Transform Message" doc:id="6f7e4ebe-722d-434a-9f52-5e0418b4e6a1" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+    </flow>
+    <flow name="put:\upsert:salesforce-ryzen-system-api-config">
+        <set-variable value="#[(attributes.queryParams.forceNull) as Boolean]" doc:name="Set fieldsToNull" doc:id="7f72d67d-8a2d-4c62-9c13-c863e083eb4e" variableName="fieldsToNull" />
+        <choice doc:name="Choice" doc:id="f9b4c9b2-b6a6-45cb-b720-ceefc40eefbb" >
+			<when expression="#[vars.fieldsToNull]">
+				<ee:transform doc:name="Transform Message" doc:id="e220f2f8-1ff5-4326-b26b-690691e7c3d9" >
+					<ee:message >
+						<ee:set-payload resource="dw-config/transform-forcenull.dwl" />
+					</ee:message>
+				</ee:transform>
+			</when>
+		</choice>
+		<salesforce:upsert doc:name="Upsert" doc:id="3ddfcccb-6983-4307-803e-c0f6e05b8739" objectType="#[attributes.queryParams.SF_Type]" externalIdFieldName="#[attributes.queryParams.Ext_Id]" config-ref="Salesforce_Config"/>
+		<ee:transform>
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+	<flow name="delete:\delete:application\json:salesforce-ryzen-system-api-config">
+        <logger level="INFO" doc:name="Logger" doc:id="a92b23a4-9136-4ab2-871e-ebc599035157" />
+		<salesforce:delete doc:name="Delete" doc:id="08ab31a9-edcc-4a27-a49a-b2984563475e" config-ref="Salesforce_Config"/>
+		<ee:transform>
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+	<flow name="get:\query:salesforce-ryzen-system-api-config">
+        <set-variable value="#[attributes.headers.response]" doc:name="Extract Response type" doc:id="986fb0fb-bd25-491c-a66e-748df87b4286" variableName="responsetype"/>
+		<ee:transform doc:name="Build Queries" doc:id="2653675f-d22c-4c61-b9c8-304b75d1033c">
+			<ee:message />
+			<ee:variables>
+				<ee:set-variable resource="dw-config/BuildSF-DynamicQuery.dwl" variableName="SF_Query" />
+			</ee:variables>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="8d6be267-01ac-4b06-89bb-419de3860185" message="#[vars.SF_Query]"/>
+		<scatter-gather doc:name="Scatter-Gather" doc:id="b8689777-2094-474d-9904-975c2e633d75">
+			<route>
+				<salesforce:query doc:name="Main Query" doc:id="fcb9a58a-f12e-4872-b3d1-c3e47d5d4bb3" config-ref="Salesforce_Config">
+			<salesforce:salesforce-query><![CDATA[#[vars.SF_Query.Query]]]></salesforce:salesforce-query>
+		</salesforce:query>
+			</route>
+			<route>
+				<choice doc:name="Choice" doc:id="480ad30f-d3d0-4adb-887b-6ce61872dd33" >
+					<when expression="#[vars.SF_Query.CountQuery != null]">
+						<salesforce:query doc:name="Count Query" doc:id="b2dfd1a5-f404-4b8a-a9f5-43dc61f94413" config-ref="Salesforce_Config">
+					<salesforce:salesforce-query><![CDATA[#[vars.SF_Query.CountQuery]]]></salesforce:salesforce-query>
+				</salesforce:query>
+					</when>
+					<otherwise >
+						<set-payload value="#[[{Rec_count:-1}]]" doc:name="Set Payload" doc:id="caec6a6f-bbc7-4fcc-bc5c-05de1d39d4b2" />
+					</otherwise>
+				</choice>
+			</route>
+		</scatter-gather>
+		<!-- <choice doc:name="Choice" doc:id="2560b82f-cd9b-4470-b30e-726dc5cbaec1" >
+			<when expression="#[false]">
+			</when>
+			<otherwise >
+				<salesforce:query doc:name="Query" doc:id="bf3f6a0c-c5b0-443b-92f0-e1dcea248f9c" config-ref="Salesforce_Config">
+					<salesforce:salesforce-query ><![CDATA[#[payload]]]></salesforce:salesforce-query>
+				</salesforce:query>
+			</otherwise>
+		</choice> -->
+		<ee:transform>
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload."0".payload]]></ee:set-payload>
+            </ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="outboundHeaders" ><![CDATA[%dw 2.0
+output application/java
+---
+{
+	TotalCount : payload."1".payload[0]."Rec_count"
+}]]></ee:set-variable>
+			</ee:variables>
+        </ee:transform>
+    </flow>
+    <flow name="get:\query-all:salesforce-ryzen-system-api-config">
+        <set-variable value="#[attributes.headers.response]" doc:name="Extract Response type" doc:id="0dd7eb8f-6c1a-4530-9d2d-296e3d5b247a" variableName="responsetype" />
+		<ee:transform doc:name="Build Queries" doc:id="3d512e77-7d36-44ed-9043-e18725cccf54" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable resource="dw-config/BuildSF-DynamicQuery.dwl" variableName="SF_Query" />
+			</ee:variables>
+		</ee:transform>
+		<scatter-gather doc:name="Scatter-Gather" doc:id="e5a21b63-dc66-4e41-a89d-9e248e8f5471" >
+			<route >
+				<salesforce:query-all doc:name="Main Query all" doc:id="fe51d8f5-eb53-4970-9f72-d2540d19cecf" config-ref="Salesforce_Config">
+			<salesforce:salesforce-query><![CDATA[#[vars.SF_Query.Query]]]></salesforce:salesforce-query>
+		</salesforce:query-all>
+			</route>
+			<route >
+				<choice doc:name="Choice" doc:id="d8e2f568-1171-4227-b5b7-69cd16c23dfb" >
+					<when expression="#[vars.SF_Query.CountQuery != null]">
+						<salesforce:query-all doc:name="Count Query all" doc:id="e16cfe82-c5a2-49b2-aa50-4522eb5af149" config-ref="Salesforce_Config">
+			<salesforce:salesforce-query><![CDATA[#[vars.SF_Query.CountQuery]]]></salesforce:salesforce-query>
+		</salesforce:query-all>
+					</when>
+					<otherwise >
+						<set-payload value="#[[{Rec_count:-1}]]" doc:name="Set Payload" doc:id="1486b6ba-daf3-44ea-8b93-f8623de706b5" />
+					</otherwise>
+				</choice>
+			</route>
+		</scatter-gather>
+		<ee:transform>
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload."0".payload]]></ee:set-payload>
+            </ee:message>
+            <ee:variables >
+				<ee:set-variable variableName="outboundHeaders" ><![CDATA[%dw 2.0
+output application/java
+---
+{
+	TotalCount : payload."1".payload[0]."Rec_count"
+}]]></ee:set-variable>
+			</ee:variables>
+        </ee:transform>
+    </flow>
+	<!-- <flow name="salesforce-ryzen-system-apiFlow" doc:id="a8046b1a-ec70-4904-8cdb-9d05b0321085" >
+		<http:listener doc:name="Listener" doc:id="391b51ee-e176-4e13-8fa3-bf33d06dd4e4" config-ref="HTTP_Listener_config" path="${app.name}/Testssss"/>
+		<choice doc:name="Choice" doc:id="40b25a00-e9bb-425b-8e73-e7ab731dd31f" >
+			<when expression="#[payload is Object]">
+				<salesforce:get-query-job-results-bulk-api-v2 doc:name="Get query job results bulk api v 2" doc:id="7428fe46-0fa4-41bd-9529-5bcd1485500e" config-ref="Salesforce_Config" id="#[payload.id]" maxRecordsPerPage="#[payload.max]"/>
+			</when>
+			<otherwise >
+				<salesforce:create-query-job-bulk-api-v2 doc:name="Create query job bulk api v 2" doc:id="23143523-fed2-46fe-bb85-985d8ff4dfea" config-ref="Salesforce_Config" query="#[payload]" />
+			</otherwise>
+		</choice>
+		<ee:transform doc:name="Transform Message" doc:id="33590c8e-4a8a-4ed2-ba15-e5cf5b54e27c" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json deferred = true
+-&#45;&#45;
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow> -->
+</mule>

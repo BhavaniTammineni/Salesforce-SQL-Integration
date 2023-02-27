@@ -1,0 +1,37 @@
+%dw 2.0
+
+type auto_0d9fe861_78cd_4292_8ebc_eb63e9ec7995_Input_Attributes = {|
+  clientCertificate?: {|
+    publicKey?: {|  |}, 
+    "type"?: String, 
+    encoded?: Binary
+  |}, 
+  headers: {|
+    response?: String, 
+    client_id: String, 
+    client_secret: String
+  |}, 
+  listenerPath: String, 
+  method: String, 
+  queryParams: {|
+    query?: String, 
+    select?: String, 
+    distinct?: Boolean, 
+    filter?: String, 
+    order?: String, 
+    descending?: Boolean, 
+    skiptoken?: String, 
+    count?: Boolean, 
+    join?: String
+  |}, 
+  queryString: String, 
+  relativePath: String, 
+  remoteAddress: String, 
+  requestPath: String, 
+  requestUri: String, 
+  scheme: String, 
+  uriParams: {| table: String |}, 
+  version: String, 
+  localAddress: String
+|}
+

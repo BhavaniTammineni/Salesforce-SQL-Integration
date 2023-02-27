@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking" xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce" xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd 
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd">
+  
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="6256565e-0537-4efc-b44e-4dce4754aed8" >
+		<http:listener-connection host="0.0.0.0" port="8082" />
+	</http:listener-config>
+	<flow name="sql-saber-main">
+        <http:listener config-ref="HTTP_Listener_config" path="${app.name}/api/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body><![CDATA[#[payload]]]></http:body>
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:error-response>
+        </http:listener>
+        <set-variable value="#[attributes.headers.response]" doc:name="Save response mimetype" doc:id="ccfb040b-2f9b-4548-9118-284811fc1325" variableName="response"/>
+		<apikit:router config-ref="sql-saber-config" />
+		<error-handler ref="global-error-handlerError_Handler"/>
+    </flow>
+    <flow name="sql-saber-console">
+        <http:listener config-ref="HTTP_Listener_config" path="${app.name}/console/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body><![CDATA[#[payload]]]></http:body>
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:console config-ref="sql-saber-config" />
+        <error-handler ref="global-error-handlerError_Handler"/>
+            
+    </flow>
+    <flow name="get:\get_records:sql-saber-config">
+        <ee:transform doc:id="0a580417-0de8-4a1d-a146-ef7bf174cbe6">
+            <ee:message>
+            </ee:message>
+			<ee:variables >
+				<ee:set-variable resource="dw-config/Build_SQL_Query.dwl" variableName="Sql_Query" />
+			</ee:variables>
+        </ee:transform>
+		<flow-ref doc:name="Execute_DB" doc:id="4f7cb5fc-900d-4042-8580-204e2a1a0bef" name="Execute_DB" />
+    </flow>
+    <flow name="get:\get_records\(table):sql-saber-config">
+        <ee:transform doc:name="Extract URI Param">
+            <ee:variables>
+                <ee:set-variable variableName="table">attributes.uriParams.'table'</ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <ee:transform doc:name="Build SQL Query" doc:id="2264a533-ff3c-4e31-8210-e8775ff53ea8" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable resource="dw-config/Build_SQL_Query.dwl" variableName="Sql_Query" />
+			</ee:variables>
+		</ee:transform>
+		<flow-ref doc:name="Execute_DB" doc:id="908107da-b09d-40cd-ad82-7997e7d49f82" name="Execute_DB"/>
+    </flow>
+    <flow name="post:\Post_Records:application\json:sql-saber-config">
+        <ee:transform doc:name="Transform Message" doc:id="c4f2cea8-2630-41b7-a048-e7233c4b4e2d" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="Table" ><![CDATA[%dw 2.0
+output application/java
+---
+attributes.queryParams.Table]]></ee:set-variable>
+				<ee:set-variable variableName="fields" ><![CDATA[%dw 2.0
+output application/java
+---
+attributes.queryParams.Fields splitBy ","]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<parse-template doc:name="Create Insert Query" doc:id="3d9ca6ea-90f8-487d-887d-fec582267e0e" target="query" outputMimeType="text/plain">
+			<content >insert into #[vars.Table] (#[vars.fields joinBy ',']) values (:#[vars.fields joinBy ',:'])</content>
+		</parse-template>
+		<logger level="INFO" doc:name="Log - Query" doc:id="f4d76b8e-a80b-40c3-a591-312e1c7c1be3" message="#[vars.query]"/>
+		<db:bulk-insert doc:name="Bulk insert" doc:id="e7605c42-9df5-46d4-be6b-c830b41d8c11" config-ref="Database_Config">
+			<db:sql><![CDATA[#[output text/plain --- vars.query]]]></db:sql>
+		</db:bulk-insert>
+		<!-- <db:select doc:name="Select" doc:id="603b0634-aa48-4199-843e-7404011ebc07" target="Exsist" config-ref="Database_Config">
+			<db:sql ><![CDATA[select ID from #[vars.Table] where ID in (:ID)]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	ID: payload.ID joinBy "'.'"
+}]]]></db:input-parameters>
+		</db:select>
+		<scatter-gather doc:name="Scatter-Gather" doc:id="2d350eb8-4a0e-4bd2-a223-738519e12d34" >
+			<route >
+				<ee:transform doc:name="Transform Message" doc:id="9320e114-6629-4d97-a895-6ea6520893ba" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+-&#45;&#45;
+payload filter !(vars.Exsist.ID contains $.ID)]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</route>
+			<route >
+				<ee:transform doc:name="Transform Message" doc:id="0c5bd11e-da34-4975-9f19-9677626b92a5" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+-&#45;&#45;
+payload filter (vars.Exsist.ID contains $.ID)]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<db:bulk-update doc:name="Bulk update" doc:id="a14f82d7-599d-4166-940e-d6c4a7544e73" config-ref="Database_Config">
+					<db:sql ><![CDATA[Update #[vars.Table] #[vars.fields map "$ = :$ " joinBy ","] where ID=:ID]]></db:sql>
+				</db:bulk-update>
+			</route>
+		</scatter-gather> -->
+		<ee:transform>
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+  message: "Records inserted Successsfully"
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+	<sub-flow name="Execute_DB" doc:id="0d9fe861-78cd-4292-8ebc-eb63e9ec7995" >
+		<logger level="INFO" doc:name="Logger" doc:id="d202674e-169a-427d-bc39-16274dec25f2" message="queries : #[vars.Sql_Query]"/>
+		<set-payload value="#[null]" doc:name="Set Payload" doc:id="0e35d61e-a575-460d-a9e0-2ce318ea9d5f" />
+		<scatter-gather doc:name="Scatter-Gather" doc:id="491118dd-c244-45b7-b6b5-ef20a3411f99">
+			<route>
+				<db:select doc:name="Get Records" doc:id="fdda5d80-1a5c-4631-bc76-3ed847c7ec08" config-ref="Database_Config">
+			<non-repeatable-iterable />
+					<db:sql><![CDATA[#[vars.'Sql_Query'.'main']]]></db:sql>
+		</db:select>
+			</route>
+			<route>
+				<choice doc:name="Choice" doc:id="4878ac4d-56eb-4f95-b217-59843b436e70" >
+					<when expression="#[vars.'Sql_Query'.'count' != null]">
+						<db:query-single doc:name="Get Count" doc:id="22b05e33-09d1-4d2a-9a21-34213603242f" config-ref="Database_Config">
+					<db:sql><![CDATA[#[vars.'Sql_Query'.'count']]]></db:sql>
+				</db:query-single>
+					</when>
+				</choice>
+			</route>
+			<route >
+				<choice doc:name="Choice" doc:id="e8238810-bd6f-440e-af67-6d937a9ea723" >
+					<when expression="#[vars.'Sql_Query'.'next' != null]">
+						<db:query-single doc:name="Get Next Page" doc:id="1452c4d7-ee5f-4784-b6ce-d28b6112d3ee" config-ref="Database_Config">
+					<db:sql><![CDATA[#[vars.'Sql_Query'.'next']]]></db:sql>
+				</db:query-single>
+					</when>
+				</choice>
+			</route>
+		</scatter-gather>
+		<ee:transform doc:name="Transform Message" doc:id="345d3191-e57e-42b3-956a-8f2fbaaf5799">
+			<ee:message>
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="outboundHeaders" ><![CDATA[%dw 2.0
+output application/json skipNullOn="everywhere"
+---
+{
+	count : payload."1".payload[0],
+	has_next: ! isEmpty(payload."2".payload)
+}]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<choice doc:name="Choice" doc:id="2d68dd10-8a61-43a9-9ca6-1d956e74f5b8" >
+			<when expression='#[lower(vars.response) == "xml"]' >
+				<ee:transform doc:name="Transform Message" doc:id="3c645f50-9667-4f03-8167-8019f48d80fa" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/xml deferred = true
+---
+Records: Record : payload."0".payload]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<when expression='#[lower(vars.response) == "csv"]' >
+				<ee:transform doc:name="Transform Message" doc:id="107bbecc-9de4-49ef-bb7e-203a8626018c" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/csv deferred = true
+---
+payload."0".payload]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<when expression='#[lower(vars.response) == "json"]' >
+				<ee:transform doc:name="Transform Message" doc:id="39f713e1-8bd2-4139-94b4-57d646b530e0" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json deferred = true
+---
+payload."0".payload]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<otherwise >
+				<ee:transform doc:name="Transform Message" doc:id="47fd16fc-01f3-42b7-8c0f-28dfe21c815a" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json deferred = true
+---
+payload."0".payload]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</otherwise>
+		</choice>
+		
+	</sub-flow>
+	<!-- <flow name="sql-saberFlow" doc:id="0cf70e1d-3314-4380-8228-78096d988122" >
+		<http:listener doc:name="Listener" doc:id="8639f4e5-a166-4e57-8902-660165adc3d6" config-ref="HTTP_Listener_config" path="/{app.name}/Test"/>
+		<logger level="INFO" doc:name="Logger" doc:id="f6ceb900-5907-4561-9ad0-017752e81a5a" message="#[correlationId]" />
+		<logger level="INFO" doc:name="Logger" doc:id="32f74a5a-d6ac-4efe-bc7c-a984740298b0" message="#[correlationId]"/>
+		<ee:transform doc:name="Transform Message" doc:id="eadf23bc-d34e-48dc-8bf2-075ceb357295" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="attribs" ><![CDATA[%dw 2.0
+output application/java
+-&#45;&#45;
+attributes]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<try doc:name="Try" doc:id="277f003a-301c-43d1-acbf-fbc37e912842" transactionalAction="BEGIN_OR_JOIN" transactionType="XA">
+			<tracking:transaction doc:name="Set Transaction Id" doc:id="7aec7957-e38e-4d91-ba87-4380ae420c96" id='#["Cst"++(correlationId default uuid())]' />
+			<logger level="INFO" doc:name="Logger" doc:id="6082fdd6-49ca-477c-89f2-2697220454ea" message="Insert Started"/>
+			<db:insert doc:name="Insert" doc:id="a2eb7787-4c92-4a72-9201-582f1f7c43cf" config-ref="Database_Config">
+				<db:sql ><![CDATA[#[payload]]]></db:sql>
+			</db:insert>
+			<logger level="INFO" doc:name="Logger" doc:id="cbd19da1-b26b-4348-b85f-5cda1a021d24" message="Insert Completed #[vars.attribs.queryParams.eval]"/>
+			<ee:transform doc:name="Transform Message" doc:id="181b83fc-26db-49c1-a278-215ecbeae010" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+import * from dw::core::URL
+-&#45;&#45;
+read(decodeURI(vars.attribs.queryParams.eval) default "1")]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+			<error-handler >
+				<on-error-propagate enableNotifications="false" logException="false" doc:name="On Error Propagate" doc:id="4c0b237b-e193-4130-935e-1a5e82555b5d" type="ANY">
+					<logger level="INFO" doc:name="Logger" doc:id="deeff711-9268-4b56-96e8-abaa9a7f0adf" message='#[output application/json -&#45;&#45; "errored"]'/>
+				</on-error-propagate>
+			</error-handler>
+		</try>
+	</flow> -->
+</mule>

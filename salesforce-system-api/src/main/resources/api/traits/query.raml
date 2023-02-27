@@ -1,0 +1,38 @@
+#%RAML 1.0 Trait
+
+description: this trait is specifically used for query,query-all endpoint
+
+queryParameters:
+  table:
+    description: field is for specifing the table/object name
+    type : string
+    required: true
+  filter:
+    description: field is for specifing the filter condition
+    type : string 
+    maxLength: 4000
+    required: false
+  pagesize:
+    description: field is for setting fixed records in result page
+    type : integer
+    default: 1000
+    minimum: 1
+    required: false
+  page : 
+    description: field is for setting page number
+    type : number
+    minimum: 1
+    default: 1
+    required: false
+  order:
+    description: field for arranging record based on the the passed field
+    required: false
+headers:
+  response:
+    required: false
+    enum:
+      - json
+      - csv
+      - xml
+    default: json
+

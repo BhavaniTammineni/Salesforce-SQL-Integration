@@ -1,0 +1,104 @@
+#%RAML 1.0
+title: Salesforce-Ryzen-System-API
+description: This API is Used to perform Salesforce Related Operations
+version: 1.0.
+traits:
+  query-fields: !include traits/query.raml
+  put_patch_fields: !include traits/put_post_Required.raml
+  clientId_sec : !include  traits/clientId_secret_enforcement.raml
+
+/query: 
+  is : [clientId_sec]
+  description: this endpoint is used for querying the salesforce
+  get : 
+    is: [query-fields]
+    queryParameters:
+      select : 
+        type : string
+        required : true
+    responses:
+      200:
+        body:
+          application/json:
+            example: |
+              [
+                {"Data" : "records from salesforce"}
+              ]
+/query-all :
+  is : [clientId_sec] 
+  description: this endpoint is used for querying the salesforce
+  get : 
+    is: [query-fields]
+    queryParameters:
+      select : 
+        type : string
+        required: true
+    responses:
+      200:
+        body:
+          application/json:
+            example: |
+              {"Data" : "records from salesforce"}
+/upsert : 
+  is : [clientId_sec]
+  description: this endpoint is used for performing upsert operation on the salesforce
+  put : 
+    is : [put_patch_fields]
+    queryParameters:
+      Ext_Id:
+        required: true
+    responses:
+      201:
+        body:
+          application/json:
+            example: |
+              [
+                {"Data" : "Response from salesforce"}
+              ]
+/update:
+  is : [clientId_sec]
+  description: this endpoint is used for performing update operation on the salesforce
+  put : 
+    is : [put_patch_fields]
+    queryParameters:
+      Ext_Id:
+        required: false
+    responses:
+      201:
+        body:
+          application/json:
+            example: |
+              [
+                {"Data" : "response from salesforce"}
+              ]
+/create:
+  is : [clientId_sec]
+  description: this endpoint is used for performing create/insert operation on the salesforce
+  post : 
+    is : [put_patch_fields]
+    responses:
+      201:
+        body:
+          application/json:
+            example: |
+              [
+                {"Data" : "response from salesforce"}
+              ]
+/delete:
+  is : [clientId_sec]
+  description: this endpoint is used for performing delete operation on the salesforce
+  delete:
+    body:
+      application/json:
+        type : array
+        example: 
+          - Salesforce_ID          
+    responses:
+      202:
+        body:
+          application/json:
+            example: |
+              [
+                {"Data" : "response from salesforce"}
+              ]
+

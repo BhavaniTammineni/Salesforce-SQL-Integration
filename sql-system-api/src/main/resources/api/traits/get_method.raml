@@ -1,0 +1,46 @@
+#%RAML 1.0 Trait
+queryParameters:
+  query:
+    required: false
+    description : this property is for executing custom query from sql
+  select :
+    required : false
+    default: "*"
+    description: field to specifically select the particular fileds from database
+  distinct : 
+    required : false
+    type : boolean
+    default: false
+    description: field to remove duplicate records from database response
+  filter : 
+    required: false
+    description: property to keep contitions
+    #default: null
+  order : 
+    required: false
+    description: property to order the records based on filed
+  descending : 
+    required: false
+    type : boolean
+    description: property depends on order parameter returns records in descending order if passed as true
+  skiptoken :
+    required: false
+    type : string
+    description: property used for pazination filed passed based on 
+  count : 
+    required: false
+    type : boolean
+    description: property to return the count of the records from database
+  join : 
+    required: false
+    type : string
+    description: filed to enable join on database queries value to be passed
+headers:
+  "response" : 
+    type: string
+    required: false
+    example: "json"
+    default: "json"
+
+
+

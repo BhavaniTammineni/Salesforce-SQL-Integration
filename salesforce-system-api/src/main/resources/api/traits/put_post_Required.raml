@@ -1,0 +1,32 @@
+#%RAML 1.0 Trait
+
+description : This Trait is used for PUT,POST,PATCH required queryparameters,headers
+
+queryParameters:
+  JOB_Mode: 
+    enum:
+      - delete
+      - hardDelete
+      - insert
+      - create
+      - query
+      - queryAll
+      - update
+      - upsert
+    required: false
+  SF_Type:
+    type : string
+    required: true
+  Ext_Id:
+    type : string
+    required: false
+  forceNull:
+    type : boolean
+    default: false
+  job_metadata:
+    type: string
+    required: false
+    example: e30=
+  
+  
+  
