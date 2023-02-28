@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:config name="Error-Handler-Test-Suite.xml" />
+	<munit:test name="Error-Handler-APIKIT:BAD_REQUEST-SuiteTest" doc:id="3bf007a2-c2e7-4442-a883-8304c7ed28c0" expectedErrorType="ANY">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="a7b02a69-f6a7-4f3b-bffe-9c883dfc669a" processor="apikit:router">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="sql-saber-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="APIKIT:BAD_REQUEST" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow Reference" doc:id="ad4f13c2-7f3e-45c5-8aa0-7a51e32d5e29" name="sql-saber-main"/>
+		</munit:execution>
+	</munit:test>
+	<munit:test name="Error-Handler-APIKIT:NOT_FOUND-SuiteTest" doc:id="06a67004-a554-425f-97e9-b184f3514df7" expectedErrorType="ANY">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="1c6aa957-462b-421d-8a3b-8d46894d65cd" processor="apikit:router">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="sql-saber-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="APIKIT:NOT_FOUND" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow Reference" doc:id="377603ee-f551-42a2-bc2a-d2f7aed69148" name="sql-saber-main"/>
+		</munit:execution>
+	</munit:test>
+	<munit:test name="Error-Handler-APIKIT:METHOD_NOT_ALLOWED-SuiteTest" doc:id="e4c21afb-f396-4113-9285-9e5e4284a066" expectedErrorType="ANY">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="fdffb6c6-cc2b-4f80-9fcc-171f92c43257" processor="apikit:router">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="sql-saber-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="APIKIT:METHOD_NOT_ALLOWED" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow Reference" doc:id="a9f9cfe3-f343-4eae-9f9b-1205a781ba99" name="sql-saber-main"/>
+		</munit:execution>
+	</munit:test>
+	<munit:test name="Error-Handler-APIKIT:NOT_ACCEPTABLE-SuiteTest" doc:id="ed6b6da6-ef45-4ec2-889a-6858200d4bdd" expectedErrorType="ANY">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="654480f2-dd83-42c6-9239-89b4392afd20" processor="apikit:router">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="sql-saber-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="APIKIT:NOT_ACCEPTABLE" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow Reference" doc:id="37cfe6c0-ddb2-4153-b8f5-40132122c041" name="sql-saber-main"/>
+		</munit:execution>
+	</munit:test>
+	<munit:test name="Error-Handler-APIKIT:UNSUPPORTED_MEDIA_TYPE-SuiteTest" doc:id="e9fdd4e0-e921-4ab3-9c3c-c6ec04243db0" expectedErrorType="ANY">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="90952f11-0526-480c-8e33-4d8bc8010d83" processor="apikit:router">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="sql-saber-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="APIKIT:UNSUPPORTED_MEDIA_TYPE" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow Reference" doc:id="b3e839c4-fbb6-44e0-aa65-0292d66cefd0" name="sql-saber-main"/>
+		</munit:execution>
+	</munit:test>
+	<munit:test name="Error-Handler-APIKIT:NOT_IMPLEMENTED-SuiteTest" doc:id="150b3d9b-47ec-45a9-a3e2-dbfa156740d4" expectedErrorType="ANY">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="eb54659c-d8fe-46aa-b3ba-546571e346bb" processor="apikit:router">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="sql-saber-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="APIKIT:NOT_IMPLEMENTED" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow Reference" doc:id="875246c6-f28c-474e-92e7-28ac2203c79f" name="sql-saber-main"/>
+		</munit:execution>
+	</munit:test>
+	<munit:test name="Error-Handler-DB:BAD_SQL_SYNTAX-SuiteTest" doc:id="b12cc3ff-9d37-4540-baa9-9a977fb7d185" expectedErrorType="ANY">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="27377713-d12d-4457-a9a2-127f1681c140" processor="apikit:router">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="sql-saber-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="DB:BAD_SQL_SYNTAX" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow Reference" doc:id="fdb8f598-8d56-448e-aa49-0c878400bb39" name="sql-saber-main"/>
+		</munit:execution>
+	</munit:test>
+	<munit:test name="Error-Handler-DB:CONNECTIVITY-SuiteTest" doc:id="85c913ff-d5b2-4780-8cea-d052520ab6ae" expectedErrorType="ANY">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="1fd7ff28-ec0f-4f54-9bc9-cc476aa37138" processor="apikit:router">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="sql-saber-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="DB:CONNECTIVITY" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow Reference" doc:id="7bd726a6-8623-44dd-8b80-9b7ef12ae8b2" name="sql-saber-main"/>
+		</munit:execution>
+	</munit:test>
+	<munit:test name="Error-Handler-HTTP:BAD_REQUEST-SuiteTest" doc:id="ca709b05-2585-4ad1-9895-71810644cadf" expectedErrorType="ANY">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="a7975540-f24f-493b-8eb7-8b683d48be6e" processor="apikit:router">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="sql-saber-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="HTTP:BAD_REQUEST" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow Reference" doc:id="de5b1062-7420-4044-8278-fd6b3ca21baf" name="sql-saber-main"/>
+		</munit:execution>
+	</munit:test>
+
+</mule>
