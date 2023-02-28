@@ -17,8 +17,9 @@ http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/ba
     <apikit:config name="salesforce-ryzen-system-api-config" api="salesforce-ryzen-system-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
     <configuration doc:name="Error Handler Configuration" doc:id="da35d3e6-063c-4447-99ae-e1c2e7358193" defaultErrorHandler-ref="global-error-handlerError_Handler" />
     <salesforce:sfdc-config name="Salesforce_Config" doc:name="Salesforce Config" doc:id="9c99fc36-28a2-496f-adaa-49880314a190" sendNullValues="true">
-		<salesforce:basic-connection username="bhavani.tammineni@salesforce.com" password="BigCompass@123" securityToken="D20VdlJNh0AIgqHocl4QvnOC" />
+		<salesforce:basic-connection username="${Salesforce.User}" password="${Salesforce.Password}" securityToken="${Salesforce.Token}" />
 	</salesforce:sfdc-config>
+	<configuration-properties doc:name="Salesforce Properties" doc:id="704f7a30-336b-4672-8254-98f9d4c6b69f" file="Salesforce-Config.properties" />
 	<error-handler name="global-error-handlerError_Handler" doc:id="52fec838-8ac2-48a8-9617-980447802018">
             <on-error-propagate type="APIKIT:BAD_REQUEST">
                 <ee:transform>

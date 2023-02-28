@@ -19,7 +19,7 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 	</db:config>
     <apikit:config name="sql-saber-config" api="sql-saber.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" keepApiBaseUri="true"/>
 	<configuration doc:name="Error Handler Configuration" doc:id="da35d3e6-063c-4447-99ae-e1c2e7358193" defaultErrorHandler-ref="global-error-handlerError_Handler" />
-	<configuration-properties doc:name="Configuration properties" doc:id="eed470b1-a02c-4724-bd6d-cd128cb28749" file="DB-Config.properties" />
+	<configuration-properties doc:name="Database properties" doc:id="eed470b1-a02c-4724-bd6d-cd128cb28749" file="DB-Config.properties" />
 	<error-handler name="global-error-handlerError_Handler" doc:id="52fec838-8ac2-48a8-9617-980447802018">
             <on-error-propagate type="APIKIT:BAD_REQUEST">
                 <ee:transform>
