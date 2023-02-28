@@ -7,7 +7,7 @@ http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/m
 	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="6256565e-0537-4efc-b44e-4dce4754aed8" >
 		<http:listener-connection host="0.0.0.0" port="8082" />
 	</http:listener-config>
-	<flow name="sql-saber-main">
+	<flow name="sql-saber-main" doc:id="7a192e24-70c4-4305-9259-54a6de957cef">
         <http:listener config-ref="HTTP_Listener_config" path="${app.name}/api/*">
             <http:response statusCode="#[vars.httpStatus default 200]">
                 <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
@@ -17,11 +17,11 @@ http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/m
                 <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
             </http:error-response>
         </http:listener>
-        <set-variable value="#[attributes.headers.response]" doc:name="Save response mimetype" doc:id="ccfb040b-2f9b-4548-9118-284811fc1325" variableName="response"/>
+<!--         <set-variable value="#[attributes.headers.response]" doc:name="Save response mimetype" doc:id="ccfb040b-2f9b-4548-9118-284811fc1325" variableName="response"/> -->
 		<apikit:router config-ref="sql-saber-config" />
 		<error-handler ref="global-error-handlerError_Handler"/>
     </flow>
-    <flow name="sql-saber-console">
+    <flow name="sql-saber-console" doc:id="8387b006-229e-4c6f-991d-d4b6a3d8a3dc">
         <http:listener config-ref="HTTP_Listener_config" path="${app.name}/console/*">
             <http:response statusCode="#[vars.httpStatus default 200]">
                 <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
@@ -72,11 +72,11 @@ attributes.queryParams.Table]]></ee:set-variable>
 				<ee:set-variable variableName="fields" ><![CDATA[%dw 2.0
 output application/java
 ---
-attributes.queryParams.Fields splitBy ","]]></ee:set-variable>
+(attributes.queryParams.Fields splitBy ",") default []]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
 		<parse-template doc:name="Create Insert Query" doc:id="3d9ca6ea-90f8-487d-887d-fec582267e0e" target="query" outputMimeType="text/plain">
-			<content >insert into #[vars.Table] (#[vars.fields joinBy ',']) values (:#[vars.fields joinBy ',:'])</content>
+			<content >insert into #[vars.Table] (#[vars.fields joinBy ','],LastModifiedTime) values (:#[vars.fields joinBy ',:'],CURRENT_TIMESTAMP)</content>
 		</parse-template>
 		<logger level="INFO" doc:name="Log - Query" doc:id="f4d76b8e-a80b-40c3-a591-312e1c7c1be3" message="#[vars.query]"/>
 		<db:bulk-insert doc:name="Bulk insert" doc:id="e7605c42-9df5-46d4-be6b-c830b41d8c11" config-ref="Database_Config">
@@ -166,13 +166,13 @@ output application/json skipNullOn="everywhere"
 }]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
-		<choice doc:name="Choice" doc:id="2d68dd10-8a61-43a9-9ca6-1d956e74f5b8" >
+		<!-- <choice doc:name="Choice" doc:id="2d68dd10-8a61-43a9-9ca6-1d956e74f5b8" >
 			<when expression='#[lower(vars.response) == "xml"]' >
 				<ee:transform doc:name="Transform Message" doc:id="3c645f50-9667-4f03-8167-8019f48d80fa" >
 					<ee:message >
 						<ee:set-payload ><![CDATA[%dw 2.0
 output application/xml deferred = true
----
+-&#45;&#45;
 Records: Record : payload."0".payload]]></ee:set-payload>
 					</ee:message>
 				</ee:transform>
@@ -182,7 +182,7 @@ Records: Record : payload."0".payload]]></ee:set-payload>
 					<ee:message >
 						<ee:set-payload ><![CDATA[%dw 2.0
 output application/csv deferred = true
----
+-&#45;&#45;
 payload."0".payload]]></ee:set-payload>
 					</ee:message>
 				</ee:transform>
@@ -192,7 +192,7 @@ payload."0".payload]]></ee:set-payload>
 					<ee:message >
 						<ee:set-payload ><![CDATA[%dw 2.0
 output application/json deferred = true
----
+-&#45;&#45;
 payload."0".payload]]></ee:set-payload>
 					</ee:message>
 				</ee:transform>
@@ -202,15 +202,16 @@ payload."0".payload]]></ee:set-payload>
 					<ee:message >
 						<ee:set-payload ><![CDATA[%dw 2.0
 output application/json deferred = true
----
+-&#45;&#45;
 payload."0".payload]]></ee:set-payload>
 					</ee:message>
 				</ee:transform>
 			</otherwise>
 		</choice>
-		
+		-->
 	</sub-flow>
-	<!-- <flow name="sql-saberFlow" doc:id="0cf70e1d-3314-4380-8228-78096d988122" >
+	<!-- 
+	<flow name="sql-saberFlow" doc:id="0cf70e1d-3314-4380-8228-78096d988122" >
 		<http:listener doc:name="Listener" doc:id="8639f4e5-a166-4e57-8902-660165adc3d6" config-ref="HTTP_Listener_config" path="/{app.name}/Test"/>
 		<logger level="INFO" doc:name="Logger" doc:id="f6ceb900-5907-4561-9ad0-017752e81a5a" message="#[correlationId]" />
 		<logger level="INFO" doc:name="Logger" doc:id="32f74a5a-d6ac-4efe-bc7c-a984740298b0" message="#[correlationId]"/>

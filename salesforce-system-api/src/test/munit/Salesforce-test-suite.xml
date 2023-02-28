@@ -1,12 +1,261 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
-	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-	xsi:schemaLocation="
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
+	xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xsi:schemaLocation="
 		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
-		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
 	<munit:config name="Salesforce-test-suite.xml" />
+	<munit:test name="Salesforce-GET-Query-Test" doc:id="7a42e64e-ec54-4d18-9cb7-d4b972e9ac67" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="dccb6168-19d9-4e05-9af2-d63b38827de3" processor="apikit:router">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="salesforce-ryzen-system-api-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-call flow="get:\query:salesforce-ryzen-system-api-config" />
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="1d849f2d-5612-4b64-993b-7f49cf0708ee" processor="salesforce:query">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Salesforce_Config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<ee:transform doc:name="Transform Message" doc:id="4f57bfb8-129a-4313-b5f4-ed985facd838" >
+				<ee:message >
+					<ee:set-attributes ><![CDATA[%dw 2.0
+output application/java
+---
+{
+	queryParams : {
+		"table":"ACCOUNT",
+		"count":true
+		
+		
+	}
+}]]></ee:set-attributes>
+				</ee:message>
+			</ee:transform>
+			<flow-ref doc:name="Flow Reference" doc:id="b0c5fb8b-118b-429e-a63d-391561dcb789" name="salesforce-ryzen-system-api-main"/>
+			<ee:transform doc:name="Transform Message1" doc:id="123ad595-f5bd-44d0-b385-be598ddc658b" >
+				<ee:message >
+					<ee:set-attributes ><![CDATA[%dw 2.0
+output application/java
+---
+{
+	queryParams : {
+		"table":"ACCOUNT",
+		"count":false
+		
+		
+	}
+}]]></ee:set-attributes>
+				</ee:message>
+			</ee:transform>
+			<flow-ref doc:name="Flow Reference1" doc:id="601c5419-23fd-4b51-b80f-b8414bc0653f" name="salesforce-ryzen-system-api-main" />
+		</munit:execution>
+	</munit:test>
+	<munit:test name="Salesforce-GET-QueryALL-Test" doc:id="5736b765-a737-447f-8eae-3e0700720054" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="d3fbc502-f139-48f4-9a5c-fc8a9222deb5" processor="apikit:router">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="salesforce-ryzen-system-api-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-call flow="get:\query-all:salesforce-ryzen-system-api-config" />
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="014290e4-2596-41d8-8be4-506bf2908f6a" processor="salesforce:query-all">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Salesforce_Config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<ee:transform doc:name="Transform Message" doc:id="67901bee-e2b6-4fa1-8a8e-b9e3a95d445e" >
+				<ee:message >
+					<ee:set-attributes ><![CDATA[%dw 2.0
+output application/java
+---
+{
+	queryParams : {
+		"table":"ACCOUNT",
+		"count":true
+		
+		
+	}
+}]]></ee:set-attributes>
+				</ee:message>
+			</ee:transform>
+			<flow-ref doc:name="Flow Reference1" doc:id="92b1d4fd-b94f-4003-87af-c01dab6d44c5" name="salesforce-ryzen-system-api-main" />
+			<ee:transform doc:name="Transform Message1" doc:id="919de0bc-7248-4057-8274-01c20604b33b" >
+				<ee:message >
+					<ee:set-attributes ><![CDATA[%dw 2.0
+output application/java
+---
+{
+	queryParams : {
+		"table":"ACCOUNT",
+		"count":false
+		
+		
+	}
+}]]></ee:set-attributes>
+				</ee:message>
+			</ee:transform>
+			<flow-ref doc:name="Flow Reference2" doc:id="66aeb4d2-b323-46b2-b3e4-6680217017cf" name="salesforce-ryzen-system-api-main" />
+		</munit:execution>
+	</munit:test>
+	<munit:test name="Salesforce-PUT-Upsert-Test" doc:id="6778b21a-5df8-4cab-80e3-48ec01e5c9eb">
+		<munit:behavior>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="708c0ebb-fdb4-450e-b547-79787963dc9f" processor="apikit:router">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute whereValue="salesforce-ryzen-system-api-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-call flow="put:\upsert:salesforce-ryzen-system-api-config" />
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="8f6c4e86-5937-4efa-8f8c-0e2064c70448" processor="salesforce:upsert">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute whereValue="Salesforce_Config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution>
+			<ee:transform doc:name="Transform Message" doc:id="3c4c378f-ba80-4fc2-9b14-4d1c82010891">
+				<ee:message>
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+[]]]></ee:set-payload>
+					<ee:set-attributes><![CDATA[%dw 2.0
+output application/java
+---
+{
+	queryParams : {
+		"SF_Type":"ACCOUNT",
+		"Ext_Id":"Id",
+		forceNull : true,	
+	}
+}]]></ee:set-attributes>
+				</ee:message>
+			</ee:transform>
+			<flow-ref doc:name="Flow Reference" doc:id="6a3060fa-b92a-4da8-aa93-8a60c352f237" name="salesforce-ryzen-system-api-main" />
+		</munit:execution>
+	</munit:test>
+	<munit:test name="Salesforce-PUT-Update-Test" doc:id="f0d673bf-f0b6-4893-9972-bce9a91c220b">
+		<munit:behavior>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="af88f4aa-c0d9-41a3-8910-b273d00f0f44" processor="apikit:router">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute whereValue="salesforce-ryzen-system-api-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-call flow="put:\update:salesforce-ryzen-system-api-config" />
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="631551f8-32cf-4d60-8c2b-680fb9417354" processor="salesforce:update">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute whereValue="Salesforce_Config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution>
+			<ee:transform doc:name="Transform Message" doc:id="db34f2e8-49ce-41bb-b4b2-4a68d56a0306">
+				<ee:message>
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+[]]]></ee:set-payload>
+					<ee:set-attributes><![CDATA[%dw 2.0
+output application/java
+---
+{
+	queryParams : {
+		"SF_Type":"ACCOUNT",
+		"Ext_Id":"Id",
+		forceNull : true,	
+	}
+}]]></ee:set-attributes>
+				</ee:message>
+			</ee:transform>
+			<flow-ref doc:name="Flow Reference" doc:id="8bde6791-6ebe-459b-9c40-a435b3e80859" name="salesforce-ryzen-system-api-main" />
+		</munit:execution>
+	</munit:test>
+	<munit:test name="Salesforce-POST-Create-Test" doc:id="7fb03590-38ea-4bf7-b28a-163aa394a6cf">
+		<munit:behavior>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="16669c5d-d0d6-4b08-ae9a-184adf432482" processor="apikit:router">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute whereValue="salesforce-ryzen-system-api-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-call flow="post:\create:salesforce-ryzen-system-api-config" />
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="93bdf70a-7801-429a-b118-7bd8df197721" processor="salesforce:create">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Salesforce_Config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution>
+			<ee:transform doc:name="Transform Message" doc:id="9af2032b-8a60-454d-a085-d3209e331c7d">
+				<ee:message>
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+[]]]></ee:set-payload>
+					<ee:set-attributes><![CDATA[%dw 2.0
+output application/java
+---
+{
+	queryParams : {
+		"SF_Type":"ACCOUNT",
+		"Ext_Id":"Id",
+		forceNull : true,	
+	}
+}]]></ee:set-attributes>
+				</ee:message>
+			</ee:transform>
+			<flow-ref doc:name="Flow Reference" doc:id="d903b725-eb0f-4a0a-85d4-d1413e043ab4" name="salesforce-ryzen-system-api-main" />
+		</munit:execution>
+	</munit:test>
+	<munit:test name="Salesforce-Delete-Test" doc:id="6a8ee13e-9bf7-41d7-81d7-f19f15c17169" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="5c6f639f-bc9f-49d7-b680-681d5ce9e387" processor="apikit:console">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="salesforce-ryzen-system-api-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-call flow="salesforce-ryzen-system-api-main" />
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="84f0f425-6886-4a8e-bcd7-fb0ddf36b540" processor="apikit:router">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="salesforce-ryzen-system-api-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-call flow="delete:\delete:application\json:salesforce-ryzen-system-api-config" />
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="acddec38-99eb-4c00-9d7e-718b2e34b15d" processor="salesforce:delete">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Salesforce_Config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<ee:transform doc:name="Transform Message" doc:id="a6c3b8c6-1581-44f9-911d-70051af47a26" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+[]]]></ee:set-payload>
+					<ee:set-attributes ><![CDATA[%dw 2.0
+output application/java
+---
+{
+	queryParams : {
+		"SF_Type":"ACCOUNT",
+		"Ext_Id":"Id",
+		forceNull : true,	
+	}
+}]]></ee:set-attributes>
+				</ee:message>
+			</ee:transform>
+			<flow-ref doc:name="Flow Reference" doc:id="3e4232c7-f13a-41ee-a27b-73395dbed852" name="salesforce-ryzen-system-api-console" />
+		</munit:execution>
+	</munit:test>
 
 </mule>

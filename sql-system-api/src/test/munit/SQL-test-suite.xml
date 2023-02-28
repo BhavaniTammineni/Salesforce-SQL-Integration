@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
+	xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<munit:config name="SQL-test-suite.xml" />
+	<munit:test name="SQL-Get-Table-suiteTest" doc:id="d5a88bb9-9dac-48d7-8343-8d7d92ab1688" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="c2fe7496-e849-4e74-8660-8e8a8f80fe3c" processor="apikit:router">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="sql-saber-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-call flow="get:\get_records\(table):sql-saber-config" />
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="b3d63da7-6561-45ea-81ba-41fc51f2b703" processor="db:select">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Database_Config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="5bc1b0e5-515d-42a7-9102-7d20e731724c" processor="db:query-single">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Database_Config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<ee:transform doc:name="Transform Message" doc:id="74cfdb1b-f12b-4df5-8e58-60469504da2d" >
+				<ee:message >
+					<ee:set-attributes ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	queryParams : {count : true}
+}]]></ee:set-attributes>
+				</ee:message>
+			</ee:transform>
+			<flow-ref doc:name="Flow Reference" doc:id="1d546264-2015-4907-80dd-a1e8742f7cb0" name="sql-saber-main"/>
+		</munit:execution>
+	</munit:test>
+	<munit:test name="SQL-Get-Table-Table-suiteTest" doc:id="b25c4120-340c-482b-8958-02aaafc58e06" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="ebb7705a-3728-403b-8731-e9a99ae91506" processor="apikit:router">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="sql-saber-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-call flow="get:\get_records:sql-saber-config" />
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="181dec73-80d4-47cb-85ee-fea451f8faeb" processor="db:select">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Database_Config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="1e6581d4-e5f6-455c-bb6b-4148326b118c" processor="db:query-single">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Database_Config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<ee:transform doc:name="Transform Message" doc:id="2c9b8389-3fda-472e-8887-1eb9a1b663b0" >
+				<ee:message >
+					<ee:set-attributes ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	queryParams : {count : true}
+}]]></ee:set-attributes>
+				</ee:message>
+			</ee:transform>
+			<flow-ref doc:name="Flow Reference" doc:id="3afb783d-cfd0-4747-9af9-82bf6afd2b42" name="sql-saber-main"/>
+		</munit:execution>
+	</munit:test>
+	<munit:test name="SQL-POST-Table-Records-suiteTest" doc:id="82a90000-3a1a-4a27-8b1f-d96fe8f08a93" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="fd370e1d-88e0-4459-b7db-3b89b7b3056d" processor="apikit:console">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="sql-saber-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-call flow="sql-saber-main" />
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="1f3b117c-dd37-40c5-9757-4fa1637b533a" processor="apikit:router">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="sql-saber-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-call flow="post:\Post_Records:application\json:sql-saber-config" />
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="9b066eb1-8046-4557-bdb0-aa1072f37dd2" processor="db:bulk-insert">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Database_Config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<ee:transform doc:name="Transform Message" doc:id="a916edd6-731c-4aae-b706-dd972ce2de4c" >
+				<ee:message >
+					<ee:set-attributes ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	queryParams : {count : true}
+}]]></ee:set-attributes>
+				</ee:message>
+			</ee:transform>
+			<flow-ref doc:name="Flow Reference" doc:id="ecca1a90-05d2-4f06-b3a0-f1b4025434f3" name="sql-saber-console"/>
+		</munit:execution>
+	</munit:test>
+
+</mule>

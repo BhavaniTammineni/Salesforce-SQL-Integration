@@ -99,5 +99,50 @@ output application/json
                     </ee:variables>
                 </ee:transform>
             </on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="b979ecc2-2cf4-4a27-8f5f-494b9499597c" type="DB:BAD_SQL_SYNTAX, DB:QUERY_EXECUTION">
+			<ee:transform doc:name="Transform Message" doc:id="49d8fcf6-5720-4126-a94c-85b854806481" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{message: "SQL Error",
+	error : error.description
+}]]></ee:set-payload>
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[500]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="0571c841-ea78-4688-baf4-962f73a13233" type="DB:CONNECTIVITY, DB:RETRY_EXHAUSTED" >
+			<ee:transform doc:name="Transform Message" doc:id="8f87f8dd-39d7-4d98-8e80-0840d0e09463" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{message: "SQL Error",
+	error : error.description
+}]]></ee:set-payload>
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[429]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="38a09673-2f81-490a-9d81-f9c7a8b5a11c" type="ANY" >
+			<ee:transform doc:name="Transform Message" doc:id="31b940ce-c8f0-4d63-803d-1b0c91dda052" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Unhandled Error",
+	error : error.description
+}]]></ee:set-payload>
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[503]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+		</on-error-propagate>
         </error-handler>
 </mule>

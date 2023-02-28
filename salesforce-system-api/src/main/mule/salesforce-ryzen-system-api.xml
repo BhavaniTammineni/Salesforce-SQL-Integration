@@ -100,7 +100,7 @@ output application/json
             </on-error-propagate>
         </error-handler> -->
     </flow>
-    <flow name="salesforce-ryzen-system-api-console">
+    <flow name="salesforce-ryzen-system-api-console" doc:id="41ce740f-c394-4d4e-aa24-779a8f6e0c7e">
         <http:listener config-ref="HTTP_Listener_config" path="${app.name}/console/*">
             <http:response statusCode="#[vars.httpStatus default 200]">
                 <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
@@ -138,7 +138,7 @@ output application/json
 				</ee:transform>
 			</when>
 		</choice>
-		<try doc:name="Try" doc:id="b35246f0-b35d-4cfb-ad15-cc3f69ecca1a" transactionalAction="BEGIN_OR_JOIN" transactionType="XA">
+		<try doc:name="Try" doc:id="b35246f0-b35d-4cfb-ad15-cc3f69ecca1a">
 			<salesforce:create type="#[attributes.queryParams.SF_Type]" doc:name="Create" doc:id="c816f0e4-4f7f-43d7-a0a3-55aa11984227" config-ref="Salesforce_Config" />
 			<error-handler >
 				<on-error-propagate enableNotifications="false" logException="false" doc:name="On Error Propagate" doc:id="b9a72a31-6f60-4b72-ac3e-f6ac9c10ba5f" type="ANY"/>
