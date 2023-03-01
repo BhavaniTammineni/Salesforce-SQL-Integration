@@ -155,6 +155,10 @@ output application/json
 		</scatter-gather>
 		<ee:transform doc:name="Transform Message" doc:id="345d3191-e57e-42b3-956a-8f2fbaaf5799">
 			<ee:message>
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload."0".payload]]></ee:set-payload>
 			</ee:message>
 			<ee:variables >
 				<ee:set-variable variableName="outboundHeaders" ><![CDATA[%dw 2.0

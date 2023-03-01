@@ -1,0 +1,4 @@
+%dw 2.0
+
+type auto_d97e84bc_3b67_4042_8714_207f8e1300b9_Input_Attributes = {| queryParams: {| key: String |} |}
+

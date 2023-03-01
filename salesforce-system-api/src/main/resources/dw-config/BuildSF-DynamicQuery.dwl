@@ -20,7 +20,7 @@ var count = d(attribs.count default true)
 		++ (if(!isEmpty(condition)) " WHERE $(condition default "")" else "") 
 		++ (if(!isEmpty(order)) " ORDER $(order default "")" else "") 
 		++ (if(pazination) " LIMIT $(pagesize) OFFSET $((page-1) * pagesize)" else ""),
-	CountQuery : if(count) ("SELECT COUNT($(select)) Rec_count FROM $(entity)" 
+	CountQuery : if(count) ("SELECT COUNT(Id) Rec_count FROM $(entity)" 
 		++ (if(!isEmpty(condition)) " WHERE $(condition default "")" else "") ) else null
 
 }

@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
+	xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<munit:config name="SQL-SF-Proc-test-suite.xml" />
+	<munit:test name="SQL-SF-Proc-FWD-suiteTest1" doc:id="94edbd3b-9b9a-4e27-b9d9-4056fd195dc2" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="eeda9dce-6dd3-429c-8cad-70dd083c8429" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="HTTP_DB_Request_configuration" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[output application/json --- [{}]]" mediaType="application/json" />
+					<munit-tools:attributes value="#[output application/json ---&#10;{&#10;	headers : has_next : true&#10;}]" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="9da13bcb-154a-4cf7-a42d-3d2d59bf7c8f" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="HTTP_SF_Request_configuration" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[%dw 2.0&#10;output application/json&#10;---&#10;[{}]]" mediaType="application/json" />
+					<munit-tools:attributes value="#[%dw 2.0&#10;output application/json&#10;---&#10;headers : {totalcount : 201}]" mediaType="application/json" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="e53faa99-88b8-421a-9a7e-9f6a2b099fb5" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Process next page" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow Reference" doc:id="b9946b16-a6db-4f6b-8529-0215bbdf0ccf" name="SQL-Salesforce-FWD-SYNC"/>
+		</munit:execution>
+	</munit:test>
+	<munit:test name="SQL-SF-Proc-FWD-suiteTest2" doc:id="8c31cb94-27ab-4abc-99db-1f5e92f3ac66" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="fc627e2f-603c-4f22-8db3-3b12b3d31831" processor="http:request" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="HTTP_DB_Request_configuration" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[output application/json --- [{}]]" mediaType="application/json" />
+					<munit-tools:attributes value="#[output application/json ---&#10;{&#10;	headers : has_next : false&#10;}]" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when1" doc:id="482101fa-4470-4020-9508-4cf947d5ebc1" processor="http:request" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="HTTP_SF_Request_configuration" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[%dw 2.0&#10;output application/json&#10;---&#10;[{}]]" mediaType="application/json" />
+					<munit-tools:attributes value="#[%dw 2.0&#10;output application/json&#10;---&#10;headers : {totalcount : 190}]" mediaType="application/json" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when2" doc:id="0252e4d0-3c08-40a3-bd7b-fbbfa7efb7ad" processor="email:send" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Email_SMTP" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow Reference" doc:id="f719f7c5-6fdf-4284-a1ce-639ab8f12151" name="SQL-Salesforce-FWD-SYNC" />
+		</munit:execution>
+	</munit:test>
+	<munit:test name="SQL-SF-Proc-REV-suiteTest" doc:id="0cd4872d-9263-4889-bd81-1c8a54120144" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="d9c2fc52-1773-4b3a-bac6-ae8449f103a0" processor="http:request" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="HTTP_DB_Request_configuration" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[output application/json --- [{}]]" mediaType="application/json" />
+					<munit-tools:attributes value="#[output application/json ---&#10;{&#10;	headers : {has_next : false}&#10;}]" mediaType="application/json" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when1" doc:id="2d496a3e-3297-4ae9-9449-f2a3f20dd4ab" processor="http:request" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="HTTP_SF_Request_configuration" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[%dw 2.0&#10;output application/json&#10;---&#10;[{}]]" mediaType="application/json" />
+					<munit-tools:attributes value="#[%dw 2.0&#10;output application/json&#10;---&#10;headers : {totalcount : 190}]" mediaType="application/json" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when2" doc:id="c9fa0fed-4368-4805-aceb-a0b5abc06a73" processor="email:send" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Email_SMTP" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow Reference" doc:id="e08ec6b9-9ef1-4520-844b-92ebccbd3ba5" name="SQL-Salesforce-REV-SYNC" />
+		</munit:execution>
+	</munit:test>
+	<munit:test name="SQL-SF-Proc-REV-suiteTest3" doc:id="2f08ec5a-d240-43dc-a0ea-ca805d87ccd5" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="fba7067b-646b-45c5-b58c-af992911aebc" processor="http:request" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="HTTP_DB_Request_configuration" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[output application/json --- [{}]]" mediaType="application/json" />
+					<munit-tools:attributes value="#[output application/json ---&#10;{&#10;	headers : {has_next : true}&#10;}]" mediaType="application/json" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when1" doc:id="e3b87df3-2266-40dc-8ead-08f158ae2161" processor="http:request" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="HTTP_SF_Request_configuration" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[%dw 2.0&#10;output application/json&#10;---&#10;[{}]]" mediaType="application/json" />
+					<munit-tools:attributes value="#[%dw 2.0&#10;output application/json&#10;---&#10;headers : {totalcount : 201}]" mediaType="application/json" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when2" doc:id="5128dac5-a740-4793-beff-58b63ef0256a" processor="flow-ref" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Process next page" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow Reference" doc:id="97f81129-7375-439a-a678-5e8163d362b0" name="SQL-Salesforce-FWD-SYNC" />
+		</munit:execution>
+	</munit:test>
+	<munit:test name="SQL-SF-Proc-Manual-suiteTest" doc:id="2c399d20-97b2-430c-b2f7-8baf59379acc" >
+		<munit:enable-flow-sources >
+			<munit:enable-flow-source value="SQL-Salesforce-Manual-SYNC" />
+		</munit:enable-flow-sources>
+		<munit:execution >
+			<ee:transform doc:name="Transform Message" doc:id="25599231-a6d4-4e4c-84c5-8ab8b96da679" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output text
+---
+now()]]></ee:set-payload>
+					<ee:set-attributes ><![CDATA[%dw 2.0
+output application/java
+---
+{
+	queryParams : key : "FWD",
+	uriParams : sync : "Manual"
+}]]></ee:set-attributes>
+				</ee:message>
+			</ee:transform>
+			<flow-ref doc:name="Flow Reference" doc:id="49cd7f20-9cdd-4a81-9a3a-50ae6e4f1dbd" name="sql-salesforce-proc-apiFlow"/>
+			<flow-ref doc:name="Flow Reference" doc:id="c90e86c0-89c4-49f9-829f-d45964bc68d4" name="SQL-Salesforce-Manual-SYNC"/>
+		</munit:execution>
+	</munit:test>
+
+</mule>
