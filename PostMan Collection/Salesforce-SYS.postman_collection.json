@@ -1,0 +1,122 @@
+{
+	"info": {
+		"_postman_id": "4fa8acc5-3c7f-4197-a4f2-6f773afedeb5",
+		"name": "Salesforce-SYS",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "GET-Records",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "client_secret",
+						"value": "1234",
+						"type": "text"
+					},
+					{
+						"key": "client_id",
+						"value": "1234",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8081/salesforce-system-api/api/query?select=Fields(ALL)&table=ACCOUNT&filter=LastModifiedDate>2023-02-27T08:07:25.000Z&pagesize=200&count=false",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"salesforce-system-api",
+						"api",
+						"query"
+					],
+					"query": [
+						{
+							"key": "select",
+							"value": "Fields(ALL)"
+						},
+						{
+							"key": "table",
+							"value": "ACCOUNT"
+						},
+						{
+							"key": "filter",
+							"value": "LastModifiedDate>2023-02-27T08:07:25.000Z"
+						},
+						{
+							"key": "pagesize",
+							"value": "200"
+						},
+						{
+							"key": "count",
+							"value": "false"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Upsert-Records",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "client_secret",
+						"value": "1234",
+						"type": "text"
+					},
+					{
+						"key": "client_id",
+						"value": "1234",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "[\n    {\n        \"ShippingLatitude\": null,\n        \"LastModifiedDate\": \"2023-02-28T08:07:25.000Z\",\n        \"BillingCity\": \"Austin\",\n        \"JigsawCompanyId\": null,\n        \"SLA__c\": \"Silver\",\n        \"type\": \"Account\",\n        \"NaicsCode\": null,\n        \"Name\": \"Edge Communications\",\n        \"Industry\": \"Electronics\",\n        \"CreatedById\": \"0052w00000FRQjZAAX\",\n        \"OperatingHoursId\": null,\n        \"TickerSymbol\": \"EDGE\",\n        \"BillingGeocodeAccuracy\": null,\n        \"AccountSource\": null,\n        \"BillingPostalCode\": null,\n        \"DandbCompanyId\": null,\n        \"PhotoUrl\": \"/services/images/photo/0012w00001MVrfRAAT\",\n        \"MasterRecordId\": null,\n        \"IsDeleted\": \"false\",\n        \"LastViewedDate\": null,\n        \"ShippingGeocodeAccuracy\": null,\n        \"DunsNumber\": null,\n        \"Sic\": \"6576\",\n        \"ShippingStreet\": \"312 Constitution Place\\nAustin, TX 78767\\nUSA\",\n        \"CleanStatus\": \"Pending\",\n        \"ShippingPostalCode\": null,\n        \"YearStarted\": null,\n        \"CreatedDate\": \"2023-02-28T08:07:25.000Z\",\n        \"CustomerPriority__c\": \"Medium\",\n        \"ShippingState\": null,\n        \"Id\": \"0912w00001MVrfRAAT\",\n        \"SicDesc\": null,\n        \"BillingState\": \"TX\",\n        \"AnnualRevenue\": \"1.39E8\",\n        \"Jigsaw\": null,\n        \"Active__c\": \"Yes\",\n        \"Site\": null,\n        \"Ownership\": \"Public\",\n        \"Description\": \"Edge, founded in 1998, is a start-up based in Austin, TX. The company designs and manufactures a device to convert music from one digital format to another. Edge sells its product through retailers and its own website.\",\n        \"Rating\": \"Hot\",\n        \"Website\": \"http://edgecomm.com\",\n        \"LastReferencedDate\": null,\n        \"BillingLatitude\": null,\n        \"NumberOfEmployees\": \"1000\",\n        \"BillingAddress\": {\n            \"country\": null,\n            \"city\": \"Austin\",\n            \"countryCode\": null,\n            \"street\": \"312 Constitution Place\\nAustin, TX 78767\\nUSA\",\n            \"latitude\": null,\n            \"postalCode\": null,\n            \"geocodeAccuracy\": null,\n            \"stateCode\": null,\n            \"state\": \"TX\",\n            \"longitude\": null\n        },\n        \"OwnerId\": \"0052w00000FRQjZAAX\",\n        \"SLASerialNumber__c\": \"2657\",\n        \"BillingLongitude\": null,\n        \"Tradestyle\": null,\n        \"Phone\": \"(512) 757-6000\",\n        \"NumberofLocations__c\": \"2.0\",\n        \"UpsellOpportunity__c\": \"Maybe\",\n        \"ShippingCountry\": null,\n        \"ShippingCity\": null,\n        \"ParentId\": null,\n        \"NaicsDesc\": null,\n        \"AccountNumber\": \"CD451796\",\n        \"SystemModstamp\": \"2023-02-28T08:07:25.000Z\",\n        \"Type\": \"Customer - Direct\",\n        \"BillingCountry\": null,\n        \"SLAExpirationDate__c\": \"2023-03-25\",\n        \"BillingStreet\": \"312 Constitution Place\\nAustin, TX 78767\\nUSA\",\n        \"ShippingAddress\": {\n            \"country\": null,\n            \"city\": null,\n            \"countryCode\": null,\n            \"street\": \"312 Constitution Place\\nAustin, TX 78767\\nUSA\",\n            \"latitude\": null,\n            \"postalCode\": null,\n            \"geocodeAccuracy\": null,\n            \"stateCode\": null,\n            \"state\": null,\n            \"longitude\": null\n        },\n        \"LastActivityDate\": null,\n        \"Fax\": \"(512) 757-9000\",\n        \"LastModifiedById\": \"0052w00000FRQjZAAX\",\n        \"ShippingLongitude\": null\n    }\n]",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8081/salesforce-system-api/api/upsert?Ext_Id=Id&JOB_Mode=upsert&SF_Type=Account&forceNull=false",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"salesforce-system-api",
+						"api",
+						"upsert"
+					],
+					"query": [
+						{
+							"key": "Ext_Id",
+							"value": "Id"
+						},
+						{
+							"key": "JOB_Mode",
+							"value": "upsert"
+						},
+						{
+							"key": "SF_Type",
+							"value": "Account"
+						},
+						{
+							"key": "forceNull",
+							"value": "false"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

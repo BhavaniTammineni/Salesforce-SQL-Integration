@@ -1,0 +1,79 @@
+{
+	"info": {
+		"_postman_id": "d0318dd5-fd1d-45a6-b81a-18d54ca7dccd",
+		"name": "SQL-Salesforce-Proc",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Manual",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "2023-02-01T12:18:41.753Z"
+				},
+				"url": {
+					"raw": "http://localhost:8083/Manual?key=FWD_Lastrun",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8083",
+					"path": [
+						"Manual"
+					],
+					"query": [
+						{
+							"key": "key",
+							"value": "FWD_Lastrun"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "FWD",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8083/FWD",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8083",
+					"path": [
+						"FWD"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "REV",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8083/REV",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8083",
+					"path": [
+						"REV"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
