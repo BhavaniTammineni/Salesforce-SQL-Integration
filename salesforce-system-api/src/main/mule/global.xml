@@ -1,25 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:batch="http://www.mulesoft.org/schema/mule/batch"
+<mule xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties"
+	xmlns:batch="http://www.mulesoft.org/schema/mule/batch"
 	xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
-	xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit"
-	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
-	xmlns="http://www.mulesoft.org/schema/mule/core"
-	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+	xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
 http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd 
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd 
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
-http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/batch/current/mule-batch.xsd">
+http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/batch/current/mule-batch.xsd
+http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd">
 	<!-- <http:listener-config name="salesforce-ryzen-system-api-httpListenerConfig">
         <http:listener-connection host="0.0.0.0" port="8081" />
     </http:listener-config> -->
     <apikit:config name="salesforce-ryzen-system-api-config" api="salesforce-ryzen-system-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
     <configuration doc:name="Error Handler Configuration" doc:id="da35d3e6-063c-4447-99ae-e1c2e7358193" defaultErrorHandler-ref="global-error-handlerError_Handler" />
     <salesforce:sfdc-config name="Salesforce_Config" doc:name="Salesforce Config" doc:id="9c99fc36-28a2-496f-adaa-49880314a190" sendNullValues="true">
-		<salesforce:basic-connection username="${Salesforce.User}" password="${Salesforce.Password}" securityToken="${Salesforce.Token}" />
+		<salesforce:basic-connection username="${Salesforce.User}" password="${secure::Salesforce.Password}" securityToken="${secure::Salesforce.Token}" />
 	</salesforce:sfdc-config>
 	<configuration-properties doc:name="Salesforce Properties" doc:id="704f7a30-336b-4672-8254-98f9d4c6b69f" file="Salesforce-Config.properties" />
+	<secure-properties:config name="Secure_Properties_Config" doc:name="Secure Properties Config" doc:id="e4cde0fb-ad88-4e84-8c8e-671144c32350" file="Salesforce-Config.properties" key="Password" >
+		<secure-properties:encrypt algorithm="Blowfish" />
+	</secure-properties:config>
 	<error-handler name="global-error-handlerError_Handler" doc:id="52fec838-8ac2-48a8-9617-980447802018">
             <on-error-propagate type="APIKIT:BAD_REQUEST">
                 <ee:transform>

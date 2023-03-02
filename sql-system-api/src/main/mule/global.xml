@@ -1,25 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:db="http://www.mulesoft.org/schema/mule/db"
+<mule xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties"
+	xmlns:db="http://www.mulesoft.org/schema/mule/db"
 	xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit"
 	xmlns:http="http://www.mulesoft.org/schema/mule/http"
-	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
-	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
 http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd 
 http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd 
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd 
-http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd">
 	 <!-- <http:listener-config name="sql-saber-httpListenerConfig">
         <http:listener-connection host="0.0.0.0" port="8081" />
     </http:listener-config> -->
      <db:config name="Database_Config" doc:name="Database Config" doc:id="f12900dd-f9e4-471f-8b16-5cdc6d3665e7" >
-		<db:my-sql-connection host="${DB.Host}" port="${DB.Port}" user="${DB.User}" password="${DB.Password}" database="${DB.Database}"/>
+		<db:my-sql-connection host="${DB.Host}" port="${DB.Port}" user="${DB.User}" password="${secure::DB.Password}" database="${DB.Database}"/>
 	</db:config>
     <apikit:config name="sql-saber-config" api="sql-saber.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" keepApiBaseUri="true"/>
 	<configuration doc:name="Error Handler Configuration" doc:id="da35d3e6-063c-4447-99ae-e1c2e7358193" defaultErrorHandler-ref="global-error-handlerError_Handler" />
 	<configuration-properties doc:name="Database properties" doc:id="eed470b1-a02c-4724-bd6d-cd128cb28749" file="DB-Config.properties" />
+	<secure-properties:config name="Secure_Properties_Config" doc:name="Secure Properties Config" doc:id="54c3049c-fbdf-4ce2-b8e8-7d017672ad1c" file="DB-Config.properties" key="Password" >
+		<secure-properties:encrypt algorithm="Blowfish" />
+	</secure-properties:config>
 	<error-handler name="global-error-handlerError_Handler" doc:id="52fec838-8ac2-48a8-9617-980447802018">
             <on-error-propagate type="APIKIT:BAD_REQUEST">
                 <ee:transform>
