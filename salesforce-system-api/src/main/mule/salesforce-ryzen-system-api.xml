@@ -6,7 +6,7 @@ http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/cu
     
     
 	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="58c17e5c-7e7f-4ef8-910d-c3e7bd2840e6" >
-		<http:listener-connection host="0.0.0.0" port="8081" />
+		<http:listener-connection host="${Http.Host}" port="${Http.Port}" />
 	</http:listener-config>
 	<flow name="salesforce-ryzen-system-api-main" doc:id="6c984bac-415d-46e8-ae51-8e597cde1804">
         <http:listener config-ref="HTTP_Listener_config" path="${app.name}/api/*">
@@ -139,7 +139,9 @@ output application/json
 			</when>
 		</choice>
 		<try doc:name="Try" doc:id="b35246f0-b35d-4cfb-ad15-cc3f69ecca1a">
-			<salesforce:create type="#[attributes.queryParams.SF_Type]" doc:name="Create" doc:id="c816f0e4-4f7f-43d7-a0a3-55aa11984227" config-ref="Salesforce_Config" />
+			<salesforce:create type="#[attributes.queryParams.SF_Type]" doc:name="Create" doc:id="c816f0e4-4f7f-43d7-a0a3-55aa11984227" config-ref="Salesforce_Config" >
+				<salesforce:records ><![CDATA[#[output application/java --- payload]]]></salesforce:records>
+			</salesforce:create>
 			<error-handler >
 				<on-error-propagate enableNotifications="false" logException="false" doc:name="On Error Propagate" doc:id="b9a72a31-6f60-4b72-ac3e-f6ac9c10ba5f" type="ANY"/>
 			</error-handler>
@@ -152,6 +154,7 @@ output application/json
 payload]]></ee:set-payload>
             </ee:message>
         </ee:transform>
+		<error-handler ref="global-error-handlerError_Handler" />
     </flow>
 	<flow name="put:\update:salesforce-ryzen-system-api-config">
 		<set-variable value="#[attributes.queryParams.forceNull default false]" doc:name="Set fieldsToNull" doc:id="2d1ca959-4ac5-4fbf-91a9-e69a2b02d9f5" variableName="fieldsToNull"/>
@@ -173,6 +176,7 @@ output application/json
 payload]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
+		<error-handler ref="global-error-handlerError_Handler" />
     </flow>
     <flow name="put:\upsert:salesforce-ryzen-system-api-config">
         <set-variable value="#[(attributes.queryParams.forceNull) as Boolean]" doc:name="Set fieldsToNull" doc:id="7f72d67d-8a2d-4c62-9c13-c863e083eb4e" variableName="fieldsToNull" />
@@ -185,7 +189,9 @@ payload]]></ee:set-payload>
 				</ee:transform>
 			</when>
 		</choice>
-		<salesforce:upsert doc:name="Upsert" doc:id="3ddfcccb-6983-4307-803e-c0f6e05b8739" objectType="#[attributes.queryParams.SF_Type]" externalIdFieldName="#[attributes.queryParams.Ext_Id]" config-ref="Salesforce_Config"/>
+		<salesforce:upsert doc:name="Upsert" doc:id="3ddfcccb-6983-4307-803e-c0f6e05b8739" objectType="#[attributes.queryParams.SF_Type]" externalIdFieldName="#[attributes.queryParams.Ext_Id]" config-ref="Salesforce_Config">
+			<salesforce:records ><![CDATA[#[output application/json --- payload as Array<Object>]]]></salesforce:records>
+		</salesforce:upsert>
 		<ee:transform>
             <ee:message>
                 <ee:set-payload><![CDATA[%dw 2.0
@@ -194,6 +200,7 @@ output application/json
 payload]]></ee:set-payload>
             </ee:message>
         </ee:transform>
+		<error-handler ref="global-error-handlerError_Handler" />
     </flow>
 	<flow name="delete:\delete:application\json:salesforce-ryzen-system-api-config">
         <logger level="INFO" doc:name="Logger" doc:id="a92b23a4-9136-4ab2-871e-ebc599035157" />
@@ -206,6 +213,7 @@ output application/json
 payload]]></ee:set-payload>
             </ee:message>
         </ee:transform>
+		<error-handler ref="global-error-handlerError_Handler" />
     </flow>
 	<flow name="get:\query:salesforce-ryzen-system-api-config">
         <set-variable value="#[attributes.headers.response]" doc:name="Extract Response type" doc:id="986fb0fb-bd25-491c-a66e-748df87b4286" variableName="responsetype"/>
@@ -260,6 +268,7 @@ output application/java
 }]]></ee:set-variable>
 			</ee:variables>
         </ee:transform>
+		<error-handler ref="global-error-handlerError_Handler" />
     </flow>
     <flow name="get:\query-all:salesforce-ryzen-system-api-config">
         <set-variable value="#[attributes.headers.response]" doc:name="Extract Response type" doc:id="0dd7eb8f-6c1a-4530-9d2d-296e3d5b247a" variableName="responsetype" />
@@ -305,6 +314,7 @@ output application/java
 }]]></ee:set-variable>
 			</ee:variables>
         </ee:transform>
+		<error-handler ref="global-error-handlerError_Handler" />
     </flow>
 	<!-- <flow name="salesforce-ryzen-system-apiFlow" doc:id="a8046b1a-ec70-4904-8cdb-9d05b0321085" >
 		<http:listener doc:name="Listener" doc:id="391b51ee-e176-4e13-8fa3-bf33d06dd4e4" config-ref="HTTP_Listener_config" path="${app.name}/Testssss"/>

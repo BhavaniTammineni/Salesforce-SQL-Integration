@@ -4,8 +4,8 @@ http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/cu
 http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
 http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd">
   
-	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="6256565e-0537-4efc-b44e-4dce4754aed8" >
-		<http:listener-connection host="0.0.0.0" port="8082" />
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="bf9e3842-0126-402a-9b06-6339135d5a4b" >
+		<http:listener-connection host="${Http.Host}" port="${Http.Port}" />
 	</http:listener-config>
 	<flow name="sql-saber-main" doc:id="7a192e24-70c4-4305-9259-54a6de957cef">
         <http:listener config-ref="HTTP_Listener_config" path="${app.name}/api/*">
@@ -75,13 +75,95 @@ output application/java
 (attributes.queryParams.Fields splitBy ",") default []]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
-		<parse-template doc:name="Create Insert Query" doc:id="3d9ca6ea-90f8-487d-887d-fec582267e0e" target="query" outputMimeType="text/plain">
-			<content >insert into #[vars.Table] (#[vars.fields joinBy ','],LastModifiedTime) values (:#[vars.fields joinBy ',:'],CURRENT_TIMESTAMP)</content>
+		<parse-template doc:name="Parse Template" doc:id="02b0124b-70a4-4867-83c4-99041a4c6370" target="Query" outputMimeType="text/plain">
+			<content >select ID from #[output application/java --- vars.Table] where ID in (#[output application/java --- &quot;'$((((payload.ID as Array default []) distinctBy ((item, index) -&gt; item) ) - null) joinBy &quot;','&quot;)'&quot;])</content>
 		</parse-template>
-		<logger level="INFO" doc:name="Log - Query" doc:id="f4d76b8e-a80b-40c3-a591-312e1c7c1be3" message="#[vars.query]"/>
-		<db:bulk-insert doc:name="Bulk insert" doc:id="e7605c42-9df5-46d4-be6b-c830b41d8c11" config-ref="Database_Config">
-			<db:sql><![CDATA[#[output text/plain --- vars.query]]]></db:sql>
-		</db:bulk-insert>
+		<logger level="INFO" doc:name="Logger" doc:id="2d9f1bb6-2780-4ac8-86ed-b4b83cef5f47" message="#[vars.Query]"/>
+		<db:select doc:name="Select" doc:id="87b62ea9-89aa-442d-b81d-16ba0f8257be" config-ref="Database_Config" target="Old_Recs">
+			<db:sql ><![CDATA[#[output text --- vars.Query]]]></db:sql>
+		</db:select>
+		<scatter-gather doc:name="Scatter-Gather" doc:id="1e351a6d-3fbb-4756-8588-8d2e29413060" >
+			<route >
+				<ee:transform doc:name="Transform Message" doc:id="ba79c223-4234-4c26-83c4-446ac8b6b20a" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload filter (not (vars.Old_Recs.ID contains $.ID))]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<parse-template doc:name="Create Insert Query" doc:id="3d9ca6ea-90f8-487d-887d-fec582267e0e" target="query" outputMimeType="text/plain">
+			<content>insert into #[vars.Table] (#[vars.fields joinBy ','],LastModifiedTime) values (:#[vars.fields joinBy ',:'],CURRENT_TIMESTAMP)</content>
+		</parse-template>
+				<logger level="INFO" doc:name="Log - Query" doc:id="f4d76b8e-a80b-40c3-a591-312e1c7c1be3" message="#[vars.query]" />
+				<parallel-foreach doc:name="Parallel For Each" doc:id="9e3d6d61-a26e-4db4-aa41-94060f86509e" >
+					<try doc:name="Try" doc:id="3395a74e-17e6-477d-a7ae-6b008d7d2fe8" >
+						<db:insert doc:name="Insert" doc:id="73da344d-020b-457e-81b8-2be67789bacb" config-ref="Database_Config">
+					<db:sql><![CDATA[#[vars.query]]]></db:sql>
+					<db:input-parameters><![CDATA[#[payload]]]></db:input-parameters>
+				</db:insert>
+						<error-handler >
+							<on-error-continue enableNotifications="false" logException="false" doc:name="On Error Continue" doc:id="2db7762a-f8fc-45eb-91d5-5c365c7f1c23" type="ANY">
+								<ee:transform doc:name="Transform Message" doc:id="d5ca2a23-0441-45f4-8637-3473b8199a36" >
+									<ee:message >
+										<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	Id:payload.ID,
+	Error : error.description
+}]]></ee:set-payload>
+									</ee:message>
+								</ee:transform>
+							</on-error-continue>
+						</error-handler>
+					</try>
+				</parallel-foreach>
+				<!-- <db:bulk-insert doc:name="Bulk insert" doc:id="e7605c42-9df5-46d4-be6b-c830b41d8c11" config-ref="Database_Config">
+					<db:sql><![CDATA[#[output text/plain -&#45;&#45; vars.query]]]></db:sql>
+				</db:bulk-insert> -->
+			</route>
+			<route >
+				<ee:transform doc:name="Transform Message1" doc:id="2b8e3a07-387a-4acd-bc24-2c60b7cf10ce" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload filter (vars.Old_Recs.ID contains $.ID)]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<parse-template doc:name="Create Update Query" doc:id="15f8f0a9-9839-4189-9460-05e99c7ac712" target="query" outputMimeType="text/plain" >
+					<content >update #[output text --- vars.Table] SET #[output text --- vars.fields map &quot;$ = :$&quot; joinBy &quot; , &quot;],LastModifiedTime = CURRENT_TIMESTAMP  where ID = :ID</content>
+				</parse-template>
+				<logger level="INFO" doc:name="Log - Query" doc:id="513bd250-3870-4b5c-97b5-bf83ef1ea761" message="#[vars.query]" />
+				<parallel-foreach doc:name="Parallel For Each" doc:id="29e84522-cc06-4f1f-a022-0d95832c483d" >
+					<try doc:name="Try" doc:id="a8169ae2-ac78-4105-a311-0b3b43694afb" >
+						<db:update doc:name="Update" doc:id="44202b7a-70f6-4c08-910a-b31d898d697c" config-ref="Database_Config">
+					<db:sql><![CDATA[#[vars.query]]]></db:sql>
+					<db:input-parameters><![CDATA[#[payload]]]></db:input-parameters>
+				</db:update>
+						<error-handler >
+							<on-error-continue enableNotifications="false" logException="false" doc:name="On Error Continue" doc:id="bdeb65ba-23b6-4883-a30a-f361c5568e2b" type="ANY">
+								<ee:transform doc:name="Transform Message" doc:id="2d492429-0ce6-452c-93fe-67c0ea0866bf" >
+									<ee:message >
+										<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	Id:payload.ID,
+	Error : error.description
+}]]></ee:set-payload>
+									</ee:message>
+								</ee:transform>
+							</on-error-continue>
+						</error-handler>
+					</try>
+				</parallel-foreach>
+				<!-- <db:bulk-update doc:name="Bulk update" doc:id="0f28de17-8b50-4835-b145-46b6dad74bf6" config-ref="Database_Config" >
+					<db:sql ><![CDATA[#[output text/plain -&#45;&#45; vars.query]]]></db:sql>
+				</db:bulk-update> -->
+			</route>
+		</scatter-gather>
 		<!-- <db:select doc:name="Select" doc:id="603b0634-aa48-4199-843e-7404011ebc07" target="Exsist" config-ref="Database_Config">
 			<db:sql ><![CDATA[select ID from #[vars.Table] where ID in (:ID)]]></db:sql>
 			<db:input-parameters ><![CDATA[#[{
@@ -118,9 +200,7 @@ payload filter (vars.Exsist.ID contains $.ID)]]></ee:set-payload>
                 <ee:set-payload><![CDATA[%dw 2.0
 output application/json
 ---
-{
-  message: "Records inserted Successsfully"
-}]]></ee:set-payload>
+flatten(payload pluck $.payload)]]></ee:set-payload>
             </ee:message>
         </ee:transform>
     </flow>
@@ -141,6 +221,9 @@ output application/json
 					<db:sql><![CDATA[#[vars.'Sql_Query'.'count']]]></db:sql>
 				</db:query-single>
 					</when>
+					<otherwise >
+						<logger level="INFO" doc:name="Logger" doc:id="c7e7d4e7-2df8-43c3-8965-94a1aaaa42e1" message="default rows"/>
+					</otherwise>
 				</choice>
 			</route>
 			<route >
@@ -150,6 +233,9 @@ output application/json
 					<db:sql><![CDATA[#[vars.'Sql_Query'.'next']]]></db:sql>
 				</db:query-single>
 					</when>
+					<otherwise >
+						<logger level="INFO" doc:name="Logger" doc:id="e4326b19-c060-4f65-849f-dae4acf335e3" message="default rows"/>
+					</otherwise>
 				</choice>
 			</route>
 		</scatter-gather>

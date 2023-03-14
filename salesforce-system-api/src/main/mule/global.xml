@@ -20,8 +20,8 @@ http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/sc
     <salesforce:sfdc-config name="Salesforce_Config" doc:name="Salesforce Config" doc:id="9c99fc36-28a2-496f-adaa-49880314a190" sendNullValues="true">
 		<salesforce:basic-connection username="${Salesforce.User}" password="${secure::Salesforce.Password}" securityToken="${secure::Salesforce.Token}" />
 	</salesforce:sfdc-config>
-	<configuration-properties doc:name="Salesforce Properties" doc:id="704f7a30-336b-4672-8254-98f9d4c6b69f" file="Salesforce-Config.properties" />
-	<secure-properties:config name="Secure_Properties_Config" doc:name="Secure Properties Config" doc:id="e4cde0fb-ad88-4e84-8c8e-671144c32350" file="Salesforce-Config.properties" key="Password" >
+	<configuration-properties doc:name="Non secure Properties" doc:id="704f7a30-336b-4672-8254-98f9d4c6b69f" file="non_secure/Config-${mule.env}.properties" />
+	<secure-properties:config name="Secure_Properties_Config" doc:name="Secure Properties Config" doc:id="e4cde0fb-ad88-4e84-8c8e-671144c32350" file="secure/Config-${mule.env}.properties" key="${Secure_PWD}" >
 		<secure-properties:encrypt algorithm="Blowfish" />
 	</secure-properties:config>
 	<error-handler name="global-error-handlerError_Handler" doc:id="52fec838-8ac2-48a8-9617-980447802018">

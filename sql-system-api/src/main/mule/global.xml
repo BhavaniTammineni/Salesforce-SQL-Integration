@@ -20,8 +20,8 @@ http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/sc
 	</db:config>
     <apikit:config name="sql-saber-config" api="sql-saber.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" keepApiBaseUri="true"/>
 	<configuration doc:name="Error Handler Configuration" doc:id="da35d3e6-063c-4447-99ae-e1c2e7358193" defaultErrorHandler-ref="global-error-handlerError_Handler" />
-	<configuration-properties doc:name="Database properties" doc:id="eed470b1-a02c-4724-bd6d-cd128cb28749" file="DB-Config.properties" />
-	<secure-properties:config name="Secure_Properties_Config" doc:name="Secure Properties Config" doc:id="54c3049c-fbdf-4ce2-b8e8-7d017672ad1c" file="DB-Config.properties" key="Password" >
+	<configuration-properties doc:name="Database properties" doc:id="eed470b1-a02c-4724-bd6d-cd128cb28749" file="non-secure/Config-${mule.env}.properties" />
+	<secure-properties:config name="Secure_Properties_Config" doc:name="Secure Properties Config" doc:id="54c3049c-fbdf-4ce2-b8e8-7d017672ad1c" file="secure/Config-${mule.env}.properties" key="Password" >
 		<secure-properties:encrypt algorithm="Blowfish" />
 	</secure-properties:config>
 	<error-handler name="global-error-handlerError_Handler" doc:id="52fec838-8ac2-48a8-9617-980447802018">

@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties" xmlns:email="http://www.mulesoft.org/schema/mule/email"
-	xmlns:file="http://www.mulesoft.org/schema/mule/file"
-	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:os="http://www.mulesoft.org/schema/mule/os" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+<mule xmlns:batch="http://www.mulesoft.org/schema/mule/batch" xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties"
+	xmlns:email="http://www.mulesoft.org/schema/mule/email"
+	xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:os="http://www.mulesoft.org/schema/mule/os" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
 http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
 http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd
-http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd">
+http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd
+http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/batch/current/mule-batch.xsd">
 	<http:request-config name="HTTP_SF_Request_configuration" doc:name="HTTP Request configuration" doc:id="7378bf1a-53dc-42fe-98dd-a2f7f5042409" basePath="${SF.Path}">
 		<http:request-connection host="${SF.Host}" port="${SF.Port}" />
 	</http:request-config>
@@ -25,9 +26,10 @@ http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/sc
 			</email:properties>
 		</email:smtp-connection>
 	</email:smtp-config>
-	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="8fdd55bc-5882-4369-83a3-d410ddead309" >
-		<http:listener-connection host="0.0.0.0" port="8083" />
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="51ea0f8a-c61f-4976-9ddd-e772009eacac" >
+		<http:listener-connection host="${Http.Host}" port="${Http.Port}" />
 	</http:listener-config>
+	
 	<configuration-properties doc:name="Configuration properties" doc:id="8cfd5bb9-b0fd-4c68-ab40-218716c0ef98" file="Config.properties" />
 	<secure-properties:config name="Secure_Properties_Config" doc:name="Secure Properties Config" doc:id="aab096d3-b65e-4ed7-8299-785a55800d1c" file="Config.properties" key="Password" >
 		<secure-properties:encrypt algorithm="Blowfish" />
@@ -37,11 +39,11 @@ http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/sc
 		<flow-ref doc:name="Flow Reference" doc:id="cb88453f-3ccc-4935-8566-ffb378d1f340" name="#[&quot;SQL-Salesforce-$(attributes.uriParams.sync default 'FWD')-SYNC&quot;]"/>
 	</flow>
 	<flow name="SQL-Salesforce-FWD-SYNC" doc:id="b38d844a-3ef2-4c70-bc31-64a7e20ea732" >
-		<scheduler doc:name="Scheduler" doc:id="a958e834-833b-472b-9da6-455ec88181f2" >
+		<!-- <scheduler doc:name="Scheduler" doc:id="a958e834-833b-472b-9da6-455ec88181f2" >
 			<scheduling-strategy >
 				<fixed-frequency frequency="10" timeUnit="MINUTES" />
 			</scheduling-strategy>
-		</scheduler>
+		</scheduler> -->
 		<os:retrieve doc:name="Retrieve" doc:id="9471310d-253a-4689-b617-ecb40868ac5f" key="FWD_Lastrun" target="LRT">
 			<os:default-value ><![CDATA[#[(now() - |P1D|) >> "UTC"]]]></os:default-value>
 		</os:retrieve>
@@ -56,8 +58,8 @@ http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/sc
 import * from dw::core::URL
 ---
 {
-	select:"Id,email__c,acceptsMarketing__c,firstName__c,lastName__c,state__c,phone,hasEmail__c,optedOutOfMobile__c,shippingAddress,billingAddress",
-	table:"ACCOUNT",
+	select:"SFID__c,state__c,billingAddress_Country__c,billingAddress_FirstName__c,billingAddress_AddressLine1__c,Name,shippingAddress_LastName__c,firstName__c,lastName__c,billingAddress_PostalCode__c,billingAddress_State__c,hasEmail__c,billingAddress_LastName__c,shippingAddress_City__c,billingAddress_City__c,shippingAddress_State__c,shippingAddress_FirstName__c,shippingAddress_AddressLine2__c,acceptsMarketing__c,phone__c,billingAddress_AddressLine2__c,billingAddress_phone__c,optedOutOfMobile__c,shippingAddress_Country__c,shippingAddress_phone__c,email__c,shippingAddress_PostalCode__c,Id,shippingAddress_AddressLine1__c",
+	table:"ACCOUNT__C",
 	filter:encodeURI("LastModifiedDate>$(vars.LRT as String)"),
 	pagesize:200,
 	count:true,
@@ -72,34 +74,34 @@ output application/json
 payload map (data,index) -> 
 {
 	"firstName": data.firstName__c,
-	"shippingAddress_Phone": data.Phone,
-	"billingAddress_PostalCode": data.BillingAddress.postalCode,
-	"billingAddress_Phone": data.Phone,
+	"shippingAddress_Phone": data.shippingAddress_phone__c as Number default null,
+	"billingAddress_PostalCode": data.billingAddress_PostalCode__c,
+	"billingAddress_Phone": data.billingAddress_phone__c as Number default null,
 	"optedOutOfMobile": if ( data.optedOutOfMobile__c default false) 1 else 0,
-	"billingAddress_LastName": data.lastName__c,
-	"shippingAddress_AddressLine1": data.ShippingAddress.street,
-	"shippingAddress_AddressLine2": data.ShippingAddress.geocodeAccuracy,
-	"shippingAddress_City": data.ShippingAddress.city,
-	"billingAddress_State": data.BillingAddress.state,
-	"ID": data.Id,
+	"billingAddress_LastName": data.billingAddress_LastName__c,
+	"shippingAddress_AddressLine1": data.shippingAddress_AddressLine1__c,
+	"shippingAddress_AddressLine2": data.shippingAddress_AddressLine2__c,
+	"shippingAddress_City": data.shippingAddress_City__c,
+	"billingAddress_State": data.billingAddress_State__c,
+	"ID": data.SFID__c,
 	"state": data.state__c,
-	"email": data.Email__c,
+	"email": data.email__c,
 	"acceptsMarketing": if ( data.acceptsMarketing__c default false) 1 else 0,
 	//"LastModifiedTime": now() as String {format : "yyyy-MM-dd hh:mm:ss.SSS"},
-	"shippingAddress_PostalCode": data.ShippingAddress.postalCode,
-	"billingAddress_FirstName": data.firstName__c,
-	"shippingAddress_LastName": data.lastName__c,
-	"shippingAddress_FirstName": data.firstName__c,
+	"shippingAddress_PostalCode": data.shippingAddress_PostalCode__c,
+	"billingAddress_FirstName": data.billingAddress_FirstName__c,
+	"shippingAddress_LastName": data.shippingAddress_LastName__c,
+	"shippingAddress_FirstName": data.shippingAddress_FirstName__c,
 	"lastName": data.lastName__c,
-	"billingAddress_AddressLine2": data.BillingAddress.country,
-	"billingAddress_City": data.BillingAddress.city,
-	"billingAddress_AddressLine1": data.BillingAddress.street,
+	"billingAddress_AddressLine2": data.billingAddress_AddressLine2__c,
+	"billingAddress_City": data.billingAddress_City__c,
+	"billingAddress_AddressLine1": data.billingAddress_AddressLine1__c,
 	"hasEmail": if ( data.hasEmail__c default false) 1 else 0,
-	"phone": data.Phone,
-	"billingAddress_Country": data.BillingAddress.country,
-	"shippingAddress_State": data.ShippingAddress.state,
-	"shippingAddress_Country": data.ShippingAddress.country
-}]]></ee:set-payload>
+	"phone": data.phone__c as Number default null,
+	"billingAddress_Country": data.billingAddress_Country__c,
+	"shippingAddress_State": data.shippingAddress_State__c,
+	"shippingAddress_Country": data.shippingAddress_Country__c
+} ]]></ee:set-payload>
 			</ee:message>
 			<ee:variables >
 				<ee:set-variable variableName="Total" ><![CDATA[%dw 2.0
@@ -108,36 +110,54 @@ output application/java
 attributes.headers.totalcount]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
-		<foreach doc:name="For Each" doc:id="9eb59a34-1a40-48fb-bbb6-72e25d0cd0b9" >
-			<try doc:name="Try" doc:id="9fc9005b-fa96-47fc-b06a-7940d16d718d" >
-				<http:request method="POST" doc:name="SQL Request" doc:id="57150b87-f8ac-41f8-b7b6-ade84b9a8495" config-ref="HTTP_DB_Request_configuration" path="Post_Records" >
-					<http:body ><![CDATA[#[output application/json 
+		<try doc:name="Try" doc:id="9fc9005b-fa96-47fc-b06a-7940d16d718d">
+				<http:request method="POST" doc:name="SQL Request" doc:id="57150b87-f8ac-41f8-b7b6-ade84b9a8495" config-ref="HTTP_DB_Request_configuration" path="Post_Records">
+					<http:body><![CDATA[#[output application/json 
 ---
 flatten([payload]) as Array]]]></http:body>
-					<http:headers ><![CDATA[#[output application/java
+					<http:headers><![CDATA[#[output application/java
 ---
 {
 	client_secret : p('secure::SQL.Client_Sec'),
 	client_id : p('SQL.Client_id')
 }]]]></http:headers>
-					<http:query-params ><![CDATA[#[output application/java
+					<http:query-params><![CDATA[#[output application/java
 ---
 {
 	Table : "Account",
-	Fields : keysOf(payload) joinBy ","
+	Fields : keysOf(payload[0]) joinBy ","
 }]]]></http:query-params>
 				</http:request>
-				<error-handler >
-					<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="b520ba99-6de7-4d3a-9aed-208a2cfa58a2" type="ANY">
-						<file:write doc:id="669a9a81-33af-4d70-a1d5-20f53a7045b7" config-ref="File_Config" path='#["$(correlationId)/FWD-Error.csv"]' mode="APPEND">
-							<file:content ><![CDATA[#[output text
+				<ee:transform doc:name="Transform Message" doc:id="0f467525-441e-4c2d-9935-23a93448e8c0">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
 ---
-payload.ID ++"  -  " ++ (error.errorMessage.payload.error default error.description)++ "\r\n"]]]></file:content>
+(
+payload map if(isEmpty($.payload.Error))
+""
+else "$($.payload.Id default 'null') - $($.payload.Error)") - ""]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<choice doc:name="Choice" doc:id="fd8b0d50-9e4f-4ef5-bada-9bca34984506" >
+				<when expression="#[!isEmpty(payload)]">
+					<file:write doc:id="669a9a81-33af-4d70-a1d5-20f53a7045b7" config-ref="File_Config" path='#["$(correlationId)/FWD-Error.csv"]' mode="APPEND">
+							<file:content><![CDATA[#[output text
+---
+payload joinBy "\r\n"]]]></file:content>
+						</file:write>
+				</when>
+			</choice>
+				<error-handler>
+					<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="b520ba99-6de7-4d3a-9aed-208a2cfa58a2" type="ANY">
+						<file:write doc:name="Write" doc:id="f9a68bad-f64d-4dff-9f6e-c735e8a1cbf4" config-ref="File_Config" path='#["$(correlationId)/FWD-Error.csv"]' mode="APPEND">
+							<file:content><![CDATA[#[output text
+---
+payload.^raw]]]></file:content>
 						</file:write>
 					</on-error-continue>
 				</error-handler>
 			</try>
-		</foreach>
 		<choice doc:name="Choice" doc:id="ebd0e903-edee-4e3d-ad9d-898c6a6657d7" >
 			<when expression="#[vars.total &gt; ((vars.Page default 1) * 200)]">
 				<set-variable value="#[(vars.Page default 1) +1]" doc:name="Set Variable" doc:id="5793e2de-5032-4e8b-86c4-ecc59b1f4509" variableName="Page"/>
@@ -164,11 +184,11 @@ payload.ID ++"  -  " ++ (error.errorMessage.payload.error default error.descript
 		</choice>
 	</flow>
 	<flow name="SQL-Salesforce-REV-SYNC" doc:id="37e8ba74-145f-434e-9f9b-7296baa07b3f" >
-		<scheduler doc:name="Scheduler" doc:id="7bc2c814-2923-41ab-bb0f-b3d748fe99bc" >
+		<!-- <scheduler doc:name="Scheduler" doc:id="7bc2c814-2923-41ab-bb0f-b3d748fe99bc" >
 			<scheduling-strategy >
 				<fixed-frequency frequency="10" timeUnit="MINUTES"/>
 			</scheduling-strategy>
-		</scheduler>
+		</scheduler> -->
 		<os:retrieve doc:name="Retrieve" doc:id="14de3f3e-55e7-418d-9f28-aee13a09c54d" key="REV_Lastrun" target="LRT">
 			<os:default-value ><![CDATA[#[%dw 2.0
 output application/json
@@ -187,40 +207,47 @@ import * from dw::core::URL
 ---
 {
 	filter : encodeURI("LastModifiedTime > '$(vars.LRT as String)'"),
-	page : vars.Page default 1
+	page : vars.Page default 1,
+	size : 200
+	
 }]]]></http:query-params>
 		</http:request>
 		<ee:transform doc:name="MAP to SF" doc:id="55c63341-fcc2-459b-b7fe-cd8475e736eb" >
 			<ee:message >
 				<ee:set-payload ><![CDATA[%dw 2.0
 output application/json
+fun asbool(xyz) = (xyz == 1) or (xyz as Boolean  default false)
 ---
-payload map (data,index) ->
+payload map (data,index) -> 
 {
-	"firstName__c": data.firstName,
-	BillingAddress: {
-		postalCode: data."billingAddress_PostalCode",
-		state: data.billingAddress_State,
-		country: data.billingAddress_Country,
-		street: data.billingAddress_AddressLine1,
-		city: data.billingAddress_City
-	},
-	optedOutOfMobile__c: data."optedOutOfMobile",
-	ShippingAddress: {
-		street: data."shippingAddress_AddressLine1",
-		geocodeAccuracy: data.shippingAddress_AddressLine2,
-		city: data.shippingAddress_City,
-		postalCode: data.shippingAddress_PostalCode,
-		state: data.shippingAddress_State,
-		country: data.shippingAddress_Country
-	},
-	"Id": data.ID,
-	"state__c": data.state,
-	"Email__c": data.email,
-	"acceptsMarketing__c": data.acceptsMarketing,
-	"lastName__c": data.lastName,
-	"hasEmail__c": data.hasEmail,
-	"Phone": data.phone
+	"firstName__c" : data.firstName ,
+	shippingAddress_phone__c : data."shippingAddress_Phone" as Number default null,
+	billingAddress_PostalCode__c : data."billingAddress_PostalCode",
+	billingAddress_phone__c : data."billingAddress_Phone" as Number default null,
+	optedOutOfMobile__c : asbool(data."optedOutOfMobile"),
+	billingAddress_LastName__c : data."billingAddress_LastName",
+	shippingAddress_AddressLine1__c : data."shippingAddress_AddressLine1",
+	shippingAddress_AddressLine2__c : data."shippingAddress_AddressLine2",
+	shippingAddress_City__c : data."shippingAddress_City",
+	billingAddress_State__c : data."billingAddress_State",
+	SFID__c : data."ID",
+	state__c : data."state",
+	email__c : data."email",
+	acceptsMarketing__c : asbool(data."acceptsMarketing"),
+	//"LastModifiedTime": now() as String {format : "yyyy-MM-dd hh:mm:ss.SSS"},
+	shippingAddress_PostalCode__c : data."shippingAddress_PostalCode",
+	billingAddress_FirstName__c : data."billingAddress_FirstName",
+	shippingAddress_LastName__c : data."shippingAddress_LastName",
+	shippingAddress_FirstName__c : data."shippingAddress_FirstName",
+	lastName__c : data."lastName",
+	billingAddress_AddressLine2__c : data."billingAddress_AddressLine2",
+	billingAddress_City__c : data."billingAddress_City",
+	billingAddress_AddressLine1__c : data."billingAddress_AddressLine1",
+	hasEmail__c : asbool(data."hasEmail"),
+	phone__c : data.phone as Number default null,
+	billingAddress_Country__c : data."billingAddress_Country",
+	shippingAddress_State__c : data."shippingAddress_State",
+	shippingAddress_Country__c : data."shippingAddress_Country"
 }]]></ee:set-payload>
 			</ee:message>
 			<ee:variables >
@@ -230,13 +257,12 @@ output application/json
 attributes.headers.has_next]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
-		<foreach doc:name="For Each" doc:id="e81ec764-16c8-49f9-bc49-e284b6354e6f" >
-			<try doc:name="Try" doc:id="4a2664a6-0da4-4736-ac4e-1e03d6acdec7">
+		<try doc:name="Try" doc:id="4a2664a6-0da4-4736-ac4e-1e03d6acdec7">
 			<http:request method="PUT" doc:name="Salesforce Request" doc:id="5e474512-b129-44b2-bc44-8aa407d9c4c7" config-ref="HTTP_SF_Request_configuration" path="upsert">
-			<http:body ><![CDATA[#[output application/json 
+			<http:body><![CDATA[#[output application/json 
 ---
 flatten([payload]) as Array]]]></http:body>
-					<http:headers ><![CDATA[#[output application/java
+					<http:headers><![CDATA[#[output application/java
 ---
 {
 	client_secret : p('secure::SF.Client_Sec'),
@@ -248,12 +274,31 @@ output application/java
 {
 	Ext_Id: "Id",
 	JOB_Mode: "upsert",
-	SF_Type: "Account",
+	SF_Type: "Account__C",
 	forceNull: false
 }]]]></http:query-params>
 		</http:request>
-			<logger level="INFO" doc:name="Logger" doc:id="f10511f2-bc77-48c6-8dd9-86e34e0a387c" message="#[payload]"/>
-				<error-handler>
+				<ee:transform doc:name="Transform Message" doc:id="3ebf73cb-1da0-450a-bc07-824e93c440e0" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+(
+payload.items map if(isEmpty($.exception))
+""
+else "$($.exception.Id default 'null') - $($.payload.Error default '')") - ""]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+			<choice doc:name="Choice" doc:id="6b56f281-3b46-4d7e-aebc-6634f22194d3" >
+				<when expression="#[!isEmpty(payload)]">
+					<file:write doc:name="Write" doc:id="70651848-2363-4763-b23d-4d7c33219272" config-ref="File_Config" path='#["$(correlationId)/REV-Error.csv"]' mode="APPEND">
+				<file:content><![CDATA[#[output text
+---
+payload joinBy "\r\n"]]]></file:content>
+			</file:write>
+				</when>
+			</choice>
+			<error-handler>
 				<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="635c4134-e2d5-457b-bf22-17f01ac06636">
 					<file:write doc:name="Write" doc:id="a1327b56-9fdd-4570-94ac-8b29d77ab002" config-ref="File_Config" path='#["$(correlationId)/Rev-Error.csv"]' mode="APPEND">
 						<file:content><![CDATA[#[output text
@@ -263,10 +308,9 @@ payload.Id ++"  -  " ++ (error.errorMessage.payload.error default error.descript
 				</on-error-continue>
 			</error-handler>
 		</try>
-		</foreach>
 		<choice doc:name="Choice" doc:id="614ae45a-f05d-4768-93d3-5536931353a5" >
 			<when expression="#[vars.has_next as Boolean default false]">
-				<set-variable value="#[(vars.Page default 0) +1]" doc:name="Set Variable" doc:id="c54d7114-e182-4c59-92f1-5460566227d8" variableName="Page" />
+				<set-variable value="#[(vars.Page default 1) +1]" doc:name="Set Variable" doc:id="c54d7114-e182-4c59-92f1-5460566227d8" variableName="Page" />
 				<flow-ref doc:name="Process next page" doc:id="45add0b1-d7a6-48c6-ad94-941f5cb2fed9" name="SQL-Salesforce-REV-SYNC"/>
 			</when>
 			<otherwise >
