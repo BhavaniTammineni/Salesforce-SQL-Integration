@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:batch="http://www.mulesoft.org/schema/mule/batch" xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties"
-	xmlns:email="http://www.mulesoft.org/schema/mule/email"
-	xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:os="http://www.mulesoft.org/schema/mule/os" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+<mule xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:batch="http://www.mulesoft.org/schema/mule/batch"
+	xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties"
+	xmlns:email="http://www.mulesoft.org/schema/mule/email" xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:os="http://www.mulesoft.org/schema/mule/os" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
 http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
 http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd
 http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd
-http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/batch/current/mule-batch.xsd">
+http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/batch/current/mule-batch.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 	<http:request-config name="HTTP_SF_Request_configuration" doc:name="HTTP Request configuration" doc:id="7378bf1a-53dc-42fe-98dd-a2f7f5042409" basePath="${SF.Path}">
 		<http:request-connection host="${SF.Host}" port="${SF.Port}" />
 	</http:request-config>
@@ -47,7 +48,7 @@ http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/ba
 		<os:retrieve doc:name="Retrieve" doc:id="9471310d-253a-4689-b617-ecb40868ac5f" key="FWD_Lastrun" target="LRT">
 			<os:default-value ><![CDATA[#[(now() - |P1D|) >> "UTC"]]]></os:default-value>
 		</os:retrieve>
-		<http:request method="GET" doc:name="Salesforce Request" doc:id="ed1bec9a-bc03-43c6-b2c1-815aa711f65c" config-ref="HTTP_SF_Request_configuration" path="query" sendCorrelationId="ALWAYS">
+		<http:request method="GET" doc:name="Salesforce Request" doc:id="ed1bec9a-bc03-43c6-b2c1-815aa711f65c" config-ref="HTTP_SF_Request_configuration" path="query" sendCorrelationId="ALWAYS" responseTimeout="3000000">
 			<http:headers ><![CDATA[#[output application/java
 ---
 {
@@ -111,7 +112,7 @@ attributes.headers.totalcount]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
 		<try doc:name="Try" doc:id="9fc9005b-fa96-47fc-b06a-7940d16d718d">
-				<http:request method="POST" doc:name="SQL Request" doc:id="57150b87-f8ac-41f8-b7b6-ade84b9a8495" config-ref="HTTP_DB_Request_configuration" path="Post_Records">
+				<http:request method="POST" doc:name="SQL Request" doc:id="57150b87-f8ac-41f8-b7b6-ade84b9a8495" config-ref="HTTP_DB_Request_configuration" path="Post_Records" responseTimeout="3000000">
 					<http:body><![CDATA[#[output application/json 
 ---
 flatten([payload]) as Array]]]></http:body>
@@ -182,6 +183,18 @@ payload.^raw]]]></file:content>
 				</async>
 			</otherwise>
 		</choice>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="5385c14a-b5a3-46e1-a142-4da6754acd60" >
+				<async doc:name="Async" doc:id="22983eed-5921-426e-b943-54a3d8367824" >
+					<email:send doc:name="Send" doc:id="41e03a1b-556c-442e-984e-91fbb05d8587" config-ref="Email_SMTP" fromAddress='#[p("SMTP.FROM")]' subject='#["SQL-Salesforce-Forward-Sync-Stopped Due to Error"]' toAddresses='#[p("SMTP.To") splitBy ","]' >
+						<email:body contentType="text/plain" >
+							<email:content ><![CDATA[#[output text/plain ---
+"Hi Team,\r\n Salesforce to SQL Sync Stopped due to Error: $(error.description)\r\n\nThanks,\r\n SF-SQL-Integration Team"]]]></email:content>
+						</email:body>
+					</email:send>
+				</async>
+			</on-error-propagate>
+		</error-handler>
 	</flow>
 	<flow name="SQL-Salesforce-REV-SYNC" doc:id="37e8ba74-145f-434e-9f9b-7296baa07b3f" >
 		<!-- <scheduler doc:name="Scheduler" doc:id="7bc2c814-2923-41ab-bb0f-b3d748fe99bc" >
@@ -195,7 +208,7 @@ output application/json
 ---
 (now() - |P1D|) as LocalDateTime {format :"yyyy-MM-dd hh:mm:ss"}]]]></os:default-value>
 		</os:retrieve>
-		<http:request method="GET" doc:name="SQL Request" doc:id="fa9a2959-fd82-4440-bbd3-7f5c826ee5a2" config-ref="HTTP_DB_Request_configuration" path="get_records/Account" >
+		<http:request method="GET" doc:name="SQL Request" doc:id="fa9a2959-fd82-4440-bbd3-7f5c826ee5a2" config-ref="HTTP_DB_Request_configuration" path="get_records/Account" responseTimeout="3000000">
 			<http:headers ><![CDATA[#[output application/java
 ---
 {
@@ -258,7 +271,7 @@ attributes.headers.has_next]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
 		<try doc:name="Try" doc:id="4a2664a6-0da4-4736-ac4e-1e03d6acdec7">
-			<http:request method="PUT" doc:name="Salesforce Request" doc:id="5e474512-b129-44b2-bc44-8aa407d9c4c7" config-ref="HTTP_SF_Request_configuration" path="upsert">
+			<http:request method="PUT" doc:name="Salesforce Request" doc:id="5e474512-b129-44b2-bc44-8aa407d9c4c7" config-ref="HTTP_SF_Request_configuration" path="upsert" responseTimeout="3000000">
 			<http:body><![CDATA[#[output application/json 
 ---
 flatten([payload]) as Array]]]></http:body>
@@ -335,6 +348,18 @@ output application/json
 				</async>
 			</otherwise>
 		</choice>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="ec146949-3ddd-475d-a339-d8cb6c02ef41" >
+				<async doc:name="Async" doc:id="53d7ab87-46b8-4541-ba32-8000a587ece8" >
+					<email:send doc:name="Send" doc:id="26dcfb5a-94dd-4eb3-9063-67a7ecf3fba0" config-ref="Email_SMTP" fromAddress='#[p("SMTP.FROM")]' subject='#["SQL-Salesforce-Backward-Sync-Stopped Due to Error"]' toAddresses='#[p("SMTP.To") splitBy ","]'>
+					<email:body contentType="text/plain">
+						<email:content><![CDATA[#[output text/plain ---
+"Hi Team,\r\n Salesforce to SQL Sync Stopped due to Error: $(error.description)\r\n\nThanks,\r\n SF-SQL-Integration Team"]]]></email:content>
+					</email:body>
+				</email:send>
+				</async>
+			</on-error-propagate>
+		</error-handler>
 	</flow>
 	<sub-flow name="SQL-Salesforce-Manual-SYNC" doc:id="53814eec-42e9-44f4-82a2-3dd0b23fdd63" >
 		<os:store doc:name="Store" doc:id="7bbe0546-f476-409f-b1e5-93f1576faa57" key="#[attributes.queryParams.key]"/>

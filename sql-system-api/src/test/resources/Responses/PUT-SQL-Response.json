@@ -1,0 +1,74 @@
+[
+    {
+        "inboundAttachmentNames": [],
+        "exceptionPayload": null,
+        "inboundPropertyNames": [],
+        "outboundAttachmentNames": [],
+        "outboundPropertyNames": [],
+        "payload": {
+            "Id": null,
+            "Error": "Column 'ID' cannot be null"
+        },
+        "attributes": null
+    },
+    {
+        "inboundAttachmentNames": [],
+        "exceptionPayload": null,
+        "inboundPropertyNames": [],
+        "outboundAttachmentNames": [],
+        "outboundPropertyNames": [],
+        "payload": {
+            "Id": null,
+            "Error": "Column 'ID' cannot be null"
+        },
+        "attributes": null
+    },
+    {
+        "inboundAttachmentNames": [],
+        "exceptionPayload": null,
+        "inboundPropertyNames": [],
+        "outboundAttachmentNames": [],
+        "outboundPropertyNames": [],
+        "payload": {
+            "Id": "LastaaaadsfdghjgfdgfdjvjdshvjhscjahdcjashcahschascjbascbsaucbsacbascbsabcsabcksabckaucausbcuaebcuasbcuabecuabcauisciuqawgduiwahdauwcgeiasecbiebvaybevgiuegaiucgaseiufoafyqoawyefowayfoayFOWyfoLastaaaadsfdghjgfdgfdjvjdshvjhscjahdcjashcahschascjbascbsaucbsacbascbsabcsabcksabckaucausbcuaebcuasbcuabecuabcauisciuqawgduiwahdauwcgeiasecbiebvaybevgiuegaiucgaseiufoafyqoawyefowayfoayFOWyfoLastaaaadsfdghjgfdgfdjvjdshvjhscjahdcjashcahschascjbascbsaucbsacbascbsabcsabcksabckaucausbcuaebcuasbcuabecuabcauisciuqawgduiwahdauwcgeiasecb",
+            "Error": "Data truncation: Data too long for column 'ID' at row 1"
+        },
+        "attributes": null
+    },
+    {
+        "inboundAttachmentNames": [],
+        "exceptionPayload": null,
+        "inboundPropertyNames": [],
+        "outboundAttachmentNames": [],
+        "outboundPropertyNames": [],
+        "payload": {
+            "generatedKeys": {},
+            "affectedRows": 1
+        },
+        "attributes": null
+    },
+    {
+        "inboundAttachmentNames": [],
+        "exceptionPayload": null,
+        "inboundPropertyNames": [],
+        "outboundAttachmentNames": [],
+        "outboundPropertyNames": [],
+        "payload": {
+            "generatedKeys": {},
+            "affectedRows": 1
+        },
+        "attributes": null
+    },
+    {
+        "inboundAttachmentNames": [],
+        "exceptionPayload": null,
+        "inboundPropertyNames": [],
+        "outboundAttachmentNames": [],
+        "outboundPropertyNames": [],
+        "payload": {
+            "generatedKeys": {},
+            "affectedRows": 1
+        },
+        "attributes": null
+    }
+]
