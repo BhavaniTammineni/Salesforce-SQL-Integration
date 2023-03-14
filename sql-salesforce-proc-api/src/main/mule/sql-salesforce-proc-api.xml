@@ -40,11 +40,11 @@ http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/cu
 		<flow-ref doc:name="Flow Reference" doc:id="cb88453f-3ccc-4935-8566-ffb378d1f340" name="#[&quot;SQL-Salesforce-$(attributes.uriParams.sync default 'FWD')-SYNC&quot;]"/>
 	</flow>
 	<flow name="SQL-Salesforce-FWD-SYNC" doc:id="b38d844a-3ef2-4c70-bc31-64a7e20ea732" >
-		<!-- <scheduler doc:name="Scheduler" doc:id="a958e834-833b-472b-9da6-455ec88181f2" >
+		<scheduler doc:name="Scheduler" doc:id="a958e834-833b-472b-9da6-455ec88181f2" >
 			<scheduling-strategy >
 				<fixed-frequency frequency="10" timeUnit="MINUTES" />
 			</scheduling-strategy>
-		</scheduler> -->
+		</scheduler>
 		<os:retrieve doc:name="Retrieve" doc:id="9471310d-253a-4689-b617-ecb40868ac5f" key="FWD_Lastrun" target="LRT">
 			<os:default-value ><![CDATA[#[(now() - |P1D|) >> "UTC"]]]></os:default-value>
 		</os:retrieve>
@@ -197,11 +197,11 @@ payload.^raw]]]></file:content>
 		</error-handler>
 	</flow>
 	<flow name="SQL-Salesforce-REV-SYNC" doc:id="37e8ba74-145f-434e-9f9b-7296baa07b3f" >
-		<!-- <scheduler doc:name="Scheduler" doc:id="7bc2c814-2923-41ab-bb0f-b3d748fe99bc" >
+		<scheduler doc:name="Scheduler" doc:id="7bc2c814-2923-41ab-bb0f-b3d748fe99bc" >
 			<scheduling-strategy >
 				<fixed-frequency frequency="10" timeUnit="MINUTES"/>
 			</scheduling-strategy>
-		</scheduler> -->
+		</scheduler>
 		<os:retrieve doc:name="Retrieve" doc:id="14de3f3e-55e7-418d-9f28-aee13a09c54d" key="REV_Lastrun" target="LRT">
 			<os:default-value ><![CDATA[#[%dw 2.0
 output application/json
