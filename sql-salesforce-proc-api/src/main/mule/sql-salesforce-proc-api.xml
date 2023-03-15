@@ -38,6 +38,16 @@ http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/cu
 	<flow name="sql-salesforce-proc-apiFlow" doc:id="d97e84bc-3b67-4042-8714-207f8e1300b9" >
 		<http:listener doc:name="Listener" doc:id="9d115e53-1709-4d5f-b59a-65cb01ebd563" config-ref="HTTP_Listener_config" path="/{sync}"/>
 		<flow-ref doc:name="Flow Reference" doc:id="cb88453f-3ccc-4935-8566-ffb378d1f340" name="#[&quot;SQL-Salesforce-$(attributes.uriParams.sync default 'FWD')-SYNC&quot;]"/>
+		<ee:transform doc:name="Transform Message" doc:id="7aefbec2-9ba7-4388-bbd8-32344e967777" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message : "Request Processed Successfully"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
 	</flow>
 	<flow name="SQL-Salesforce-FWD-SYNC" doc:id="b38d844a-3ef2-4c70-bc31-64a7e20ea732" >
 		<scheduler doc:name="Scheduler" doc:id="a958e834-833b-472b-9da6-455ec88181f2" >
@@ -135,7 +145,7 @@ flatten([payload]) as Array]]]></http:body>
 output application/json
 ---
 (
-payload map if(isEmpty($.payload.Error))
+(payload default [] ) map if(isEmpty($.payload.Error))
 ""
 else "$($.payload.Id default 'null') - $($.payload.Error)") - ""]]></ee:set-payload>
 					</ee:message>
@@ -297,7 +307,7 @@ output application/java
 output application/json
 ---
 (
-payload.items map if(isEmpty($.exception))
+(payload.items default []) map if(isEmpty($.exception))
 ""
 else "$($.exception.Id default 'null') - $($.payload.Error default '')") - ""]]></ee:set-payload>
 				</ee:message>
@@ -316,7 +326,7 @@ payload joinBy "\r\n"]]]></file:content>
 					<file:write doc:name="Write" doc:id="a1327b56-9fdd-4570-94ac-8b29d77ab002" config-ref="File_Config" path='#["$(correlationId)/Rev-Error.csv"]' mode="APPEND">
 						<file:content><![CDATA[#[output text
 ---
-payload.Id ++"  -  " ++ (error.errorMessage.payload.error default error.description) ++ "\r\n"]]]></file:content>
+payload.^raw]]]></file:content>
 					</file:write>
 				</on-error-continue>
 			</error-handler>

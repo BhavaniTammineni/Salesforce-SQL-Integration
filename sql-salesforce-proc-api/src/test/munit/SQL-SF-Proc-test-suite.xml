@@ -38,6 +38,13 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 		<munit:execution >
 			<flow-ref doc:name="Flow Reference" doc:id="b9946b16-a6db-4f6b-8529-0215bbdf0ccf" name="SQL-Salesforce-FWD-SYNC"/>
 		</munit:execution>
+		<munit:validation >
+			<munit-tools:verify-call doc:name="Verify call" doc:id="77e1ca9a-8d56-429b-aabc-32731384ce19" processor="os:retrieve" atLeast="1">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Retrieve" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+		</munit:validation>
 	</munit:test>
 	<munit:test name="SQL-SF-Proc-FWD-suiteTest2" doc:id="8c31cb94-27ab-4abc-99db-1f5e92f3ac66" >
 		<munit:behavior >
@@ -68,6 +75,13 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 		<munit:execution >
 			<flow-ref doc:name="Flow Reference" doc:id="f719f7c5-6fdf-4284-a1ce-639ab8f12151" name="SQL-Salesforce-FWD-SYNC" />
 		</munit:execution>
+		<munit:validation >
+			<munit-tools:verify-call doc:name="Verify call" doc:id="483ba2da-ce9f-45ae-bc04-117a4c807555" processor="os:retrieve" atLeast="1">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Retrieve" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+		</munit:validation>
 	</munit:test>
 	<munit:test name="SQL-SF-Proc-REV-suiteTest" doc:id="0cd4872d-9263-4889-bd81-1c8a54120144" >
 		<munit:behavior >
@@ -98,6 +112,13 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 		<munit:execution >
 			<flow-ref doc:name="Flow Reference" doc:id="e08ec6b9-9ef1-4520-844b-92ebccbd3ba5" name="SQL-Salesforce-REV-SYNC" />
 		</munit:execution>
+		<munit:validation >
+			<munit-tools:verify-call doc:name="Verify call" doc:id="dd0a2103-80dd-4b8b-b950-83efe1a4ae63" processor="os:retrieve" atLeast="1">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Retrieve" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+		</munit:validation>
 	</munit:test>
 	<munit:test name="SQL-SF-Proc-REV-suiteTest3" doc:id="2f08ec5a-d240-43dc-a0ea-ca805d87ccd5" >
 		<munit:behavior >
@@ -128,6 +149,13 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 		<munit:execution >
 			<flow-ref doc:name="Flow Reference" doc:id="97f81129-7375-439a-a678-5e8163d362b0" name="SQL-Salesforce-FWD-SYNC" />
 		</munit:execution>
+		<munit:validation >
+			<munit-tools:verify-call doc:name="Verify call" doc:id="3aaf2933-c8da-4159-9514-5f391f0a5b35" processor="os:retrieve" atLeast="1">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Retrieve" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+		</munit:validation>
 	</munit:test>
 	<munit:test name="SQL-SF-Proc-Manual-suiteTest" doc:id="2c399d20-97b2-430c-b2f7-8baf59379acc" >
 		<munit:enable-flow-sources >
@@ -152,6 +180,13 @@ output application/java
 			<flow-ref doc:name="Flow Reference" doc:id="49cd7f20-9cdd-4a81-9a3a-50ae6e4f1dbd" name="sql-salesforce-proc-apiFlow"/>
 			<flow-ref doc:name="Flow Reference" doc:id="c90e86c0-89c4-49f9-829f-d45964bc68d4" name="SQL-Salesforce-Manual-SYNC"/>
 		</munit:execution>
+		<munit:validation >
+			<munit-tools:verify-call doc:name="Verify call" doc:id="87b13289-9c5a-4eac-8525-0af6494c0fde" processor="os:store" atLeast="1">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Store" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+		</munit:validation>
 	</munit:test>
 
 </mule>
