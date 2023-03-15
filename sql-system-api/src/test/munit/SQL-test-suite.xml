@@ -9,13 +9,14 @@
 		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
 	<munit:config name="SQL-test-suite.xml" />
+	<global-property doc:name="Global Property" doc:id="9b53a65f-f4be-4455-8885-5ef9c762d06d" name="mule.env" value="Dev" />
 	<munit:test name="SQL-Get-Table-suiteTest" doc:id="d5a88bb9-9dac-48d7-8343-8d7d92ab1688" >
 		<munit:behavior >
 			<munit-tools:mock-when doc:name="Mock when" doc:id="c2fe7496-e849-4e74-8660-8e8a8f80fe3c" processor="apikit:router">
 				<munit-tools:with-attributes >
 					<munit-tools:with-attribute whereValue="sql-saber-config" attributeName="config-ref" />
 				</munit-tools:with-attributes>
-				<munit-tools:then-call flow="get:\get_records\(table):sql-saber-config" />
+				<munit-tools:then-call flow="get:\(table):sql-saber-config" />
 			</munit-tools:mock-when>
 			<munit-tools:mock-when doc:name="Mock when" doc:id="b3d63da7-6561-45ea-81ba-41fc51f2b703" processor="db:select">
 				<munit-tools:with-attributes >
@@ -48,7 +49,7 @@ output application/json
 				<munit-tools:with-attributes >
 					<munit-tools:with-attribute whereValue="sql-saber-config" attributeName="config-ref" />
 				</munit-tools:with-attributes>
-				<munit-tools:then-call flow="get:\get_records:sql-saber-config" />
+				<munit-tools:then-call flow="get:\(table):sql-saber-config" />
 			</munit-tools:mock-when>
 			<munit-tools:mock-when doc:name="Mock when" doc:id="181dec73-80d4-47cb-85ee-fea451f8faeb" processor="db:select">
 				<munit-tools:with-attributes >
@@ -87,9 +88,22 @@ output application/json
 				<munit-tools:with-attributes >
 					<munit-tools:with-attribute whereValue="sql-saber-config" attributeName="config-ref" />
 				</munit-tools:with-attributes>
-				<munit-tools:then-call flow="post:\Post_Records:application\json:sql-saber-config" />
+				<munit-tools:then-call flow="post:\(table):application\json:sql-saber-config" />
 			</munit-tools:mock-when>
-			<munit-tools:mock-when doc:name="Mock when" doc:id="9b066eb1-8046-4557-bdb0-aa1072f37dd2" processor="db:bulk-insert">
+			<munit-tools:mock-when doc:name="Mock when" doc:id="536f4488-089d-4c57-8600-72160c3d1f7c" processor="db:select">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Select" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[output application/json --- []]" mediaType="application/json" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="a47e1c99-572b-4067-8030-b9efda0f441f" processor="db:insert">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Database_Config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="9414e2ce-920b-4f9f-8bea-aacaf7cc145c" processor="db:update">
 				<munit-tools:with-attributes >
 					<munit-tools:with-attribute whereValue="Database_Config" attributeName="config-ref" />
 				</munit-tools:with-attributes>
@@ -98,16 +112,32 @@ output application/json
 		<munit:execution >
 			<ee:transform doc:name="Transform Message" doc:id="a916edd6-731c-4aae-b706-dd972ce2de4c" >
 				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+[{
+}]]]></ee:set-payload>
 					<ee:set-attributes ><![CDATA[%dw 2.0
 output application/json
 ---
 {
-	queryParams : {count : true}
+	queryParams : {count : true,
+		Table:"Account",
+Fields:"firstName,shippingAddress_Phone,billingAddress_PostalCode,billingAddress_Phone,optedOutOfMobile,billingAddress_LastName,shippingAddress_AddressLine1,shippingAddress_AddressLine2,shippingAddress_City,billingAddress_State,ID,state,email,acceptsMarketing,shippingAddress_PostalCode,billingAddress_FirstName,shippingAddress_LastName,shippingAddress_FirstName,lastName,billingAddress_AddressLine2,billingAddress_City,billingAddress_AddressLine1,hasEmail,phone,billingAddress_Country,shippingAddress_State,shippingAddress_Country"
+	},
+	uriParams: table : "Account"
 }]]></ee:set-attributes>
 				</ee:message>
 			</ee:transform>
 			<flow-ref doc:name="Flow Reference" doc:id="ecca1a90-05d2-4f06-b3a0-f1b4025434f3" name="sql-saber-console"/>
 		</munit:execution>
+		<munit:validation >
+			<munit-tools:verify-call doc:name="Verify call" doc:id="386e90f3-519d-41cb-af76-295d17a3f67d" processor="parse-template" atLeast="1">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="02b0124b-70a4-4867-83c4-99041a4c6370" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+		</munit:validation>
 	</munit:test>
 
 </mule>

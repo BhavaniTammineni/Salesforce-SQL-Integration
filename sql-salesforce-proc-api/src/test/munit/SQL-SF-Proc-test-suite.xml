@@ -9,6 +9,7 @@
 		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
 	<munit:config name="SQL-SF-Proc-test-suite.xml" />
+	<global-property doc:name="Global Property" doc:id="2235dce0-1304-4ec5-9289-aad6d89073a3" name="mule.env" value="Dev" />
 	<munit:test name="SQL-SF-Proc-FWD-suiteTest1" doc:id="94edbd3b-9b9a-4e27-b9d9-4056fd195dc2" >
 		<munit:behavior >
 			<munit-tools:mock-when doc:name="Mock when" doc:id="eeda9dce-6dd3-429c-8cad-70dd083c8429" processor="http:request">

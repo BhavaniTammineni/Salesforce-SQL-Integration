@@ -9,6 +9,7 @@
 		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
 	<munit:config name="Salesforce-test-suite.xml" />
+	<global-property doc:name="Global Property" doc:id="649bf8a6-f1fd-448a-8daa-3240cbf9c7a3" name="mule.env" value="Dev" />
 	<munit:test name="Salesforce-GET-Query-Test" doc:id="7a42e64e-ec54-4d18-9cb7-d4b972e9ac67" >
 		<munit:behavior >
 			<munit-tools:mock-when doc:name="Mock when" doc:id="dccb6168-19d9-4e05-9af2-d63b38827de3" processor="apikit:router">

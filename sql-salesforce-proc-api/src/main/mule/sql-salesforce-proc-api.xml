@@ -49,7 +49,7 @@ output application/json
 			</ee:message>
 		</ee:transform>
 	</flow>
-	<flow name="SQL-Salesforce-FWD-SYNC" doc:id="b38d844a-3ef2-4c70-bc31-64a7e20ea732" >
+	<flow name="SQL-Salesforce-FWD-SYNC" doc:id="b38d844a-3ef2-4c70-bc31-64a7e20ea732" initialState="stopped">
 		<scheduler doc:name="Scheduler" doc:id="a958e834-833b-472b-9da6-455ec88181f2" >
 			<scheduling-strategy >
 				<fixed-frequency frequency="10" timeUnit="MINUTES" />
@@ -72,7 +72,7 @@ import * from dw::core::URL
 	select:"SFID__c,state__c,billingAddress_Country__c,billingAddress_FirstName__c,billingAddress_AddressLine1__c,Name,shippingAddress_LastName__c,firstName__c,lastName__c,billingAddress_PostalCode__c,billingAddress_State__c,hasEmail__c,billingAddress_LastName__c,shippingAddress_City__c,billingAddress_City__c,shippingAddress_State__c,shippingAddress_FirstName__c,shippingAddress_AddressLine2__c,acceptsMarketing__c,phone__c,billingAddress_AddressLine2__c,billingAddress_phone__c,optedOutOfMobile__c,shippingAddress_Country__c,shippingAddress_phone__c,email__c,shippingAddress_PostalCode__c,Id,shippingAddress_AddressLine1__c",
 	table:"ACCOUNT__C",
 	filter:encodeURI("LastModifiedDate>$(vars.LRT as String)"),
-	pagesize:200,
+	pagesize:2,
 	count:true,
 	page:vars.Page default 1
 }]]]></http:query-params>
@@ -122,7 +122,7 @@ attributes.headers.totalcount]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
 		<try doc:name="Try" doc:id="9fc9005b-fa96-47fc-b06a-7940d16d718d">
-				<http:request method="POST" doc:name="SQL Request" doc:id="57150b87-f8ac-41f8-b7b6-ade84b9a8495" config-ref="HTTP_DB_Request_configuration" path="Post_Records" responseTimeout="3000000">
+				<http:request method="POST" doc:name="SQL Request" doc:id="57150b87-f8ac-41f8-b7b6-ade84b9a8495" config-ref="HTTP_DB_Request_configuration" path="Account" responseTimeout="3000000">
 					<http:body><![CDATA[#[output application/json 
 ---
 flatten([payload]) as Array]]]></http:body>
@@ -218,7 +218,7 @@ output application/json
 ---
 (now() - |P1D|) as LocalDateTime {format :"yyyy-MM-dd hh:mm:ss"}]]]></os:default-value>
 		</os:retrieve>
-		<http:request method="GET" doc:name="SQL Request" doc:id="fa9a2959-fd82-4440-bbd3-7f5c826ee5a2" config-ref="HTTP_DB_Request_configuration" path="get_records/Account" responseTimeout="3000000">
+		<http:request method="GET" doc:name="SQL Request" doc:id="fa9a2959-fd82-4440-bbd3-7f5c826ee5a2" config-ref="HTTP_DB_Request_configuration" path="Account" responseTimeout="3000000">
 			<http:headers ><![CDATA[#[output application/java
 ---
 {
@@ -295,7 +295,7 @@ flatten([payload]) as Array]]]></http:body>
 output application/java
 ---
 {
-	Ext_Id: "Id",
+	Ext_Id: "SFID__c",
 	JOB_Mode: "upsert",
 	SF_Type: "Account__C",
 	forceNull: false
@@ -309,7 +309,7 @@ output application/json
 (
 (payload.items default []) map if(isEmpty($.exception))
 ""
-else "$($.exception.Id default 'null') - $($.payload.Error default '')") - ""]]></ee:set-payload>
+else "$($.payload.id default 'null') - $($.payload.errors.message[0] default '')") - ""]]></ee:set-payload>
 				</ee:message>
 			</ee:transform>
 			<choice doc:name="Choice" doc:id="6b56f281-3b46-4d7e-aebc-6634f22194d3" >

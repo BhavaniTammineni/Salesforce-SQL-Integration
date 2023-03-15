@@ -1,21 +1,11 @@
 #%RAML 1.0
-title: SQL-Saber
+title: SQL-System-API
 description: This project is based on SQL-Basic-END Points
 traits:
   Get-props: !include traits/get_method.raml
   Get-response: !include traits/get_response.raml
   client-id-required: !include traits/client_id_enforcement.raml
-/get_records:
-  is: [Get-props,client-id-required]
-  get:
-      description: to get records from database based on inputs
-      queryParameters:
-        table :
-          required : false
-          type: string
-          description: property to return the count of the records from database
-      is : [Get-response]
-  /{table}:
+/{table}:
     is: [Get-props,client-id-required]
     uriParameters:
       table: 
@@ -24,31 +14,24 @@ traits:
     get:
       description: to get records from database based on inputs
       is : [Get-response]
-/Post_Records:
-  is : [client-id-required]
-  post: 
-    description: To Insert Records into Database
-    queryParameters:
-      Table : 
-        type: string
-        required: true
-        description: to insert into the table
-      Fields:
-        type: string
-        pattern: ^(.+)(,(.+))*$
-        description: Fields to Insert into Database Table
-    body:
-      application/json:
-        type: array
-        items: object
-    responses:
-      201:
-        body:
-          application/json:
-            example:
-              { 
-                message : "Records Inserted /Successsfully"}
-
-                
+    post: 
+      description: To Insert Records into Database
+      queryParameters:
+        Fields:
+          type: string
+          pattern: ^(.+)(,(.+))*$
+          description: Fields to Insert into Database Table
+      body:
+        application/json:
+          type: array
+          items: object
+          example: 
+      responses:
+        201:
+          body:
+            application/json:
+              example:
+                { 
+                  message : "Records Inserted Successsfully"}
       
         
